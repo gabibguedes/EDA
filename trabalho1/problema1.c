@@ -36,7 +36,7 @@ int main() {
   return 0;
 }
 
-int fneuronio (float * entrada, float * pesos, float limiarT, int tamanho, int * neuronio){
+void fneuronio (float * entrada, float * pesos, float limiarT, int tamanho, int * neuronio){
   double somap = 0;
 
   for(int i = 0; i < tamanho; i++){
@@ -44,7 +44,7 @@ int fneuronio (float * entrada, float * pesos, float limiarT, int tamanho, int *
   }
 
   if (limiarT < somap) {
-     *neuronio = 1;
+    *neuronio = 1;
   }else{
     *neuronio = 0;
   }
