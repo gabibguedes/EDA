@@ -1,31 +1,31 @@
 #include <stdio.h>
 
-int fneuronio(float *, float *, float *, int *);
+int fneuronio(float *, float *, float, int, int *);
 
 int main() {
-  int TAMANHO = 10, neuronio;
-  float entrada[TAMANHO],
-        pesos[TAMANHO],
+  int neuronio;
+  float entrada[10],
+        pesos[10],
         limiarT;
 
-  printf("Escreva os valores de entrada:\n");
+  printf("\nEscreva os valores de entrada:\n");
 
-  for (int i = 0; i < TAMANHO; i++){
+  for (int i = 0; i < 10; i++){
     printf("%do elemento: ", i+1);
     scanf("%f", &entrada[i]);
   }
 
-  printf("Escreva os valores dos pesos:\n");
+  printf("\nEscreva os valores dos pesos:\n");
 
-  for (int i = 0; i < TAMANHO; i++){
+  for (int i = 0; i < 10; i++){
     printf("%do peso: ", i+1);
     scanf("%f", &pesos[i]);
   }
 
-  printf("Valor do limiar T: ");
+  printf("\nValor do limiar T: ");
   scanf("%f", &limiarT);
 
-  neuronio = fneuronio(entrada, pesos, &limiarT, &TAMANHO);
+  fneuronio(entrada, pesos, limiarT, 10, &neuronio);
 
   if(neuronio){
     printf("\nNeurônio ativado!\n");
@@ -36,17 +36,17 @@ int main() {
   return 0;
 }
 
-int fneuronio (float * entrada, float * pesos, float * limiarT, int * tamanho){
+int fneuronio (float * entrada, float * pesos, float limiarT, int tamanho, int * neuronio){
   double somap = 0;
 
-  for(int i = 0; i < *tamanho; i++){
+  for(int i = 0; i < tamanho; i++){
     somap += entrada[i] * pesos[i];
   }
 
-  if (*limiarT < somap) {
-    return 1;
+  if (limiarT < somap) {
+     *neuronio = 1;
   }else{
-    return 0;
+    *neuronio = 0;
   }
 
 }
