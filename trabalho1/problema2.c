@@ -1,3 +1,15 @@
+/*
+Estruturas de Dados 1
+
+Professor: Mateus Mendelson
+Turma: B
+
+Alunos:
+  Gabriela Barrozo Guedes - 16/0121612
+  Felipe Campos de Almeida - 16/0119553
+  Helena Bretas Goulart - 16/0124034
+*/
+
 #include <stdio.h>
 
 void recebe_notas (float *, int, float *);
