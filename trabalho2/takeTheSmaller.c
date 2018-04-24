@@ -7,12 +7,10 @@ int binToDec (int *vet){
   for (int i = 8; i >= 0; i--) {
     dec += powTwo[i] * vet[i];
   }
-
   return dec;
 }
 
 int takeTheSmaller(int *vet){
-
   int smaller = 513;
   int vetAux[9];
   for (int m = 0; m < 9; m++) {
