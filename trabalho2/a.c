@@ -11,39 +11,37 @@ int binToDec (int *vet){
   return dec;
 }
 
-
 int main() {
 
-  int vet[9] = { 0, 1, 1, 1, 0, 1, 0, 1, 0};
+  int vet[9] = { 0, 1, 1, 1, 0, 1, 0, 1, 1};
   int smaller = 513;
   int vetAux[9];
-for (int m = 0; m < 9; m++) {
-  for (int i = 0; i < 9; i++) {
-    vetAux[i] = vet[8];
+  for (int m = 0; m < 9; m++) {
+    vetAux[0] = vet[8];
     for (int j = 1; j < 9; j++) {
       vetAux[j] = vet[j-1];
     }
-  }
-  printf("%d", vetAux[0]);
-  printf("%d", vetAux[1]);
-  printf("%d", vetAux[2]);
-  printf("%d", vetAux[3]);
-  printf("%d", vetAux[4]);
-  printf("%d", vetAux[5]);
-  printf("%d", vetAux[6]);
-  printf("%d", vetAux[7]);
-  printf("%d\n", vetAux[8]);
 
-  for (int k = 0; k < 9; k++) {
-    vet[k]= vetAux[k];
-  }
-  printf("%d\n", binToDec(vetAux));
-  if(binToDec(vetAux)< smaller){
-    smaller= binToDec(vetAux);
-  }
-}
+    printf("%d", vetAux[0]);
+    printf("%d", vetAux[1]);
+    printf("%d", vetAux[2]);
+    printf("%d", vetAux[3]);
+    printf("%d", vetAux[4]);
+    printf("%d", vetAux[5]);
+    printf("%d", vetAux[6]);
+    printf("%d", vetAux[7]);
+    printf("%d\n", vetAux[8]);
 
-printf("\n%d", smaller);
+    for (int k = 0; k < 9; k++) {
+      vet[k]= vetAux[k];
+    }
+    printf("%d\n", binToDec(vetAux));
+    if(binToDec(vetAux)< smaller){
+      smaller= binToDec(vetAux);
+    }
+  }
+
+  printf("\n%d", smaller);
 
   return 0;
 }

@@ -10,12 +10,16 @@ void chose_files(int *photos){
   j=0;
   while (j<25) {
     unique = 1;
-    random_number = rand() % 50;
+    //Escolhe um número aleatório de 1 a 50
+    random_number = (rand() % 50) + 1;
+
     for (i = 0; i < j; i++) {
+      //Compara o número escolhido com cada número já existente no vetor
       if (photos[i] == random_number) {
         unique = 0;
       }
     }
+    //Se o número não for repetido ele é adicionado ao vetor
     if (unique){
       photos[j] = random_number;
       printf("%d ", photos[j]);

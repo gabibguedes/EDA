@@ -15,24 +15,19 @@ int takeTheSmaller(int *vet){
 
   int smaller = 513;
   int vetAux[9];
-for (int m = 0; m < 9; m++) {
-  for (int i = 0; i < 9; i++) {
+  for (int m = 0; m < 9; m++) {
     vetAux[i] = vet[8];
     for (int j = 1; j < 9; j++) {
       vetAux[j] = vet[j-1];
     }
+    for (int k = 0; k < 9; k++) {
+      vet[k]= vetAux[k];
+    }
+    if(binToDec(vetAux)< smaller){
+      smaller= binToDec(vetAux);
+    }
   }
-  for (int k = 0; k < 9; k++) {
-    vet[k]= vetAux[k];
-  }
-
-  if(binToDec(vetAux)< smaller){
-    smaller= binToDec(vetAux);
-  }
-}
-
   return smaller;
-
 }
 
 int main(int argc, char const *argv[]) {
