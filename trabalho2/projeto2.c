@@ -1,16 +1,8 @@
 #include <stdio.h>
 #include "lib/file_manipulation.h"
+#include "lib/bin_operations.h"
 
-int shift_amount(int value){
-  int smaller = value;
-  for(int i=0; i < 9; i++){
-    value = ((value >> 1) | (value << 8)) & 511;
-    if(value < smaller){
-      smaller = value;
-    }
-  }
-  return smaller;
-}
+
 
 void ILBP(char *file_name){
 

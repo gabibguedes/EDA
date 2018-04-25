@@ -9,16 +9,15 @@ Em nosso trabalho, temos as bibliotecas na pasta lib/, os arquivos .o na pasta o
 * Para compilar as bibliotecas:
 
 ```
-
 gcc -o obj/file_manipulation.o -c lib/file_manipulation.c
+gcc -o obj/bin_operations.o -c lib/bin_operations.c
 
 ```
 
 * Para compilar o programa:
 
 ```
-
-gcc projeto2.c obj/file_manipulation.o -o bin/a.out
+gcc projeto2.c obj/file_manipulation.o obj/bin_operations.o -o bin/a.out
 
 ```
 
