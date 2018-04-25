@@ -38,8 +38,13 @@ void chose_files(int *photos){
     }
   }
 }
-void ILBP(char file[100]){
 
+void ILBP(char *file_name){
+
+}
+
+void GLCM(char *file_name){
+  
 }
 
 void file_path(char *file_name_asphalt, char *file_name_grass, int number){
@@ -71,6 +76,23 @@ int count_columns(char *file_name){
   return columns;
 }
 
+int count_lines(char *file_name){
+  int number, lines = 0, on_file = 1;
+  char line_break;
+
+  FILE *fp;
+
+  fp =fopen(file_name, "r");
+
+  while(!feof(fp)){
+    fscanf(fp, "%c", &line_break);
+    if(line_break == '\n'){
+      lines ++;
+    }
+  }
+  return lines - 1;
+}
+
 
 int main(){
   int photos[25], columns, lines;
@@ -87,16 +109,18 @@ int main(){
 
     //ASFALTO
     columns = count_columns(file_asphalt);
+    lines = count_lines(file_asphalt);
 
     printf("File chosen: %s\n",file_asphalt );
     printf("number of columns: %d\n", columns);
+    printf("number of lines: %d\n", lines);
+
     //ILBP(file_asphalt);
 
     //GRAMA
-    columns = count_columns(file_grass);
-
-    printf("File chosen: %s\n",file_grass );
-    printf("number of columns: %d\n", columns);
+    // columns = count_columns(file_grass);
+    //lines = count_lines(file_grass);
+    //
     //ILBP(file_grass);
 
   }
