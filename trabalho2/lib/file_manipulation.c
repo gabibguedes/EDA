@@ -13,8 +13,8 @@ void file_path(char *file_name_asphalt, char *file_name_grass, int number){
 
 }
 
-void chose_files(int *photos){
-  int i, j, unique, random_number;
+void chose_files(int *photos, int *rest){
+  int i, j, k, unique, random_number;
 
   srand(time(NULL));
 
@@ -34,6 +34,22 @@ void chose_files(int *photos){
     if (unique){
       photos[j] = random_number;
       j++;
+    }
+  }
+
+  k=0;
+  while(k < 25){
+    for(i = 1; i < 51; i++){
+      unique = 1;
+      for(j=0; j<25; j++){
+        if(photos[j] == i){
+          unique = 0;
+        }
+      }
+      if(unique){
+        rest[k] = i;
+        k++;
+      }
     }
   }
 }
