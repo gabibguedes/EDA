@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 void file_path(char *file_name_asphalt, char *file_name_grass, int number){
   char asphalt_file[] = "DataSet/asphalt/asphalt_";
   char grass_file[] = "DataSet/grass/grass_";
