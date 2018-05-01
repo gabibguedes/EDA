@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
 #include "bin_operations.h"
 
 int binToDec (int *vet){
@@ -11,7 +10,7 @@ int binToDec (int *vet){
   for (int i = 8; i >= 0; i--) {
     dec += powTwo[i] * vet[i];
   }
-
+  
   return dec;
 }
 
