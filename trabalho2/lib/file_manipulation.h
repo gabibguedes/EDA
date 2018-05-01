@@ -5,5 +5,6 @@ void file_path (char*, char*, int);
 void chose_files(int*, int*);
 int count_columns(char*);
 int count_lines(char*);
+int** build_matrix(char *, int, int);
 
 #endif

@@ -90,3 +90,23 @@ int count_lines(char *file_name){
   }
   return lines - 1;
 }
+
+int** build_matrix(char *file_name, int lines, int columns){
+  int ** matrix;
+  char caractere;
+   matrix = (int**) calloc (lines, sizeof(int *));
+   for(int i=0; i <= lines; i++){
+       matrix[i] = (int*) calloc (columns, sizeof(int));
+   }
+
+   FILE *fp;
+   fp = fopen(file_name, "r");
+
+   for(int l=0; l<lines; l++){
+     for (int c = 0; c < columns; c++) {
+       fscanf(fp, "%d%c", &matrix[l][c], &caractere);
+     }
+   }
+   fclose(fp);
+   return matrix;
+}
