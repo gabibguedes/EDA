@@ -19,7 +19,7 @@ gcc -o obj/glcm.o -c lib/glcm.c
 * Para compilar o programa:
 
 ```
-gcc projeto2.c obj/file_manipulation.o obj/bin_operations.o obj/ilbp.o obj/glcm.o -lm -o bin/a.out
+gcc projeto2.c obj/file_manipulation.o obj/bin_operations.o obj/ilbp.o obj/glcm.o -lncurses -lm -o bin/a.out
 
 ```
 
