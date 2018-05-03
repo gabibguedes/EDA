@@ -14,7 +14,7 @@ void print_loading(char *loading, int position){
   mvprintw(1,0,"Carregando imagens, isso pode demorar um pouco");
   mvprintw(3,0,"[");
   //Atualiza a barra
-  for (int l = 0; l < 100; l++) {
+  for (int l = 0; l < 50; l++) {
     mvprintw (3, l+1, "%c", loading[l]);
   }
   mvprintw(3,100,"]loading...\n");
@@ -23,11 +23,10 @@ void print_loading(char *loading, int position){
 
 int main(){
   int photos_test[25], photos_training[25], columns, lines, load=0;
-  char file_asphalt[100], file_grass[100], loading[100];
-  int **file_matrix;
+  char loading[50];
 
   //Inicializando vetor de loading zerado
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 50; i++) {
     loading[i] = ' ';
   }
 
@@ -69,70 +68,16 @@ int main(){
 
   //Começa a leitura dos arquivos e os calculos
   for (int i = 0; i < 25; i++) {
+    //Para teste e treinamento é solucionado os vetores de 537 posições
+
     //ARQUIVOS DE TESTE
-    //Monta os caminhos dos arquivos de grama e asfalto
-    file_path(file_asphalt, file_grass, photos_test[i]);
-
-    //ASFALTO
-    //calcula linhas e colunas:
-    columns = count_columns(file_asphalt);
-    lines = count_lines(file_asphalt);
-
-    //monta a matriz do arquivo
-    file_matrix = build_matrix(file_asphalt, lines, columns);
-    //Calcula o ILBP e GLCM
-    ILBP(file_matrix, lines, columns, super_vector_asphalt_test[i]);
-    GLCM(file_matrix, lines, columns, super_vector_asphalt_test[i]);
-    vector_normalize(super_vector_asphalt_test[i]);
-
-    //print_loading(loading, load); //Atualiza a tela de loading
-    load++;
-
-    //GRAMA
-    //calcula linhas e colunas:
-    columns = count_columns(file_grass);
-    lines = count_lines(file_grass);
-
-    //monta a matriz do arquivo
-    file_matrix = build_matrix(file_grass, lines, columns);
-    //Calcula o ILBP e GLCM
-    ILBP(file_matrix, lines, columns, super_vector_grass_test[i]);
-    GLCM(file_matrix, lines, columns, super_vector_grass_test[i]);
-    vector_normalize(super_vector_grass_test[i]);
-
+    ILBP_GLCM_vector(super_vector_asphalt_test[i], super_vector_grass_test[i], photos_test[i]);
     //print_loading(loading, load); //Atualiza a tela de loading
     load++;
 
     //ARQUIVOS DE TREINAMENTO
-    //Monta os caminhos dos arquivos de grama e asfalto
-    file_path(file_asphalt, file_grass, photos_training[i]);
+    ILBP_GLCM_vector(super_vector_asphalt_training[i], super_vector_grass_training[i], photos_training[i]);
 
-    //ASFALTO
-    //calcula linhas e colunas:
-    columns = count_columns(file_asphalt);
-    lines = count_lines(file_asphalt);
-
-    //monta a matriz do arquivo
-    file_matrix = build_matrix(file_asphalt, lines, columns);
-    //Calcula o ILBP e GLCM
-    ILBP(file_matrix, lines, columns, super_vector_asphalt_training[i]);
-    GLCM(file_matrix, lines, columns, super_vector_asphalt_training[i]);
-    vector_normalize(super_vector_asphalt_training[i]);
-
-    //print_loading(loading, load);//Atualiza a tela de loading
-    load++;
-
-    //GRAMA
-    //calcula linhas e colunas:
-    columns = count_columns(file_grass);
-    lines = count_lines(file_grass);
-
-    //monta a matriz do arquivo
-    file_matrix = build_matrix(file_grass, lines, columns);
-    //Calcula o ILBP e GLCM
-    ILBP(file_matrix, lines, columns, super_vector_grass_training[i]);
-    GLCM(file_matrix, lines, columns, super_vector_grass_training[i]);
-    vector_normalize(super_vector_grass_training[i]);
     //print_loading(loading, load);//Atualiza a tela de loading
     load++;
     printf("\nAsphalt test\n");
