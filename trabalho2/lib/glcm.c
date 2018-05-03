@@ -3,8 +3,8 @@
 #include <math.h>
 #include "glcm.h"
 
-void GLCM(int **matrix, int lines, int columns, int* super_vector){
-  int *properties;
+void GLCM(int **matrix, int lines, int columns, double* super_vector){
+  double *properties;
   properties = north(matrix, lines, columns);
   add_to_vector(513, properties, super_vector);
   properties = south(matrix, lines, columns);
@@ -24,16 +24,16 @@ void GLCM(int **matrix, int lines, int columns, int* super_vector){
 
 }
 
-void add_to_vector(int position, int* properties, int * super_vector){
+void add_to_vector(int position, double* properties, double * super_vector){
   for (int i=0; i<3; i++){
     super_vector[position + i] = properties[i];
   }
   free(properties);
 }
 
-int* north(int **matrix, int lines, int columns){ // Norte
+double* north(int **matrix, int lines, int columns){ // Norte
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** north_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -57,9 +57,9 @@ int* north(int **matrix, int lines, int columns){ // Norte
   return properties;
 }
 
-int* south(int **matrix, int lines, int columns){ // Sul
+double* south(int **matrix, int lines, int columns){ // Sul
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** south_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -83,9 +83,9 @@ int* south(int **matrix, int lines, int columns){ // Sul
   return properties;
 }
 
-int* west(int **matrix, int lines, int columns){ // Oeste (esquerda)
+double* west(int **matrix, int lines, int columns){ // Oeste (esquerda)
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** west_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -109,9 +109,9 @@ int* west(int **matrix, int lines, int columns){ // Oeste (esquerda)
   return properties;
 }
 
-int* east(int **matrix, int lines, int columns){ // Leste (direita)
+double* east(int **matrix, int lines, int columns){ // Leste (direita)
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** east_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -135,9 +135,9 @@ int* east(int **matrix, int lines, int columns){ // Leste (direita)
   return properties;
 }
 
-int* northeast(int **matrix, int lines, int columns){ // Nordeste = norte + leste
+double* northeast(int **matrix, int lines, int columns){ // Nordeste = norte + leste
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** northeast_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -161,9 +161,9 @@ int* northeast(int **matrix, int lines, int columns){ // Nordeste = norte + lest
   return properties;
 }
 
-int* northwest(int **matrix, int lines, int columns){ // Noroeste = norte + oeste
+double* northwest(int **matrix, int lines, int columns){ // Noroeste = norte + oeste
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** northwest_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -187,9 +187,9 @@ int* northwest(int **matrix, int lines, int columns){ // Noroeste = norte + oest
   return properties;
 }
 
-int* southeast(int **matrix, int lines, int columns){ // Sudeste = sul + leste
+double* southeast(int **matrix, int lines, int columns){ // Sudeste = sul + leste
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** southeast_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -213,9 +213,9 @@ int* southeast(int **matrix, int lines, int columns){ // Sudeste = sul + leste
   return properties;
 }
 
-int* south_west(int **matrix, int lines, int columns){ // Sudoeste = sul + oeste
+double* south_west(int **matrix, int lines, int columns){ // Sudoeste = sul + oeste
   int element, neighbor;
-  int* properties = (int*) calloc(3, sizeof(int));
+  double* properties = (double*) calloc(3, sizeof(double));
 
   int** south_west_matrix = (int**) calloc(256, sizeof(int*));
   for (int i = 0; i < 256; i++) {
@@ -239,8 +239,9 @@ int* south_west(int **matrix, int lines, int columns){ // Sudoeste = sul + oeste
   return properties;
 }
 
-int calc_energy(int **matrix){
-  int sum = 0, i, j;
+double calc_energy(int **matrix){
+  int i, j;
+  double sum =0;
   for (i = 0; i < 256; i++) {
     for (j = 0; j < 256; j++) {
       sum += pow(matrix[i][j],2.0);
@@ -249,9 +250,9 @@ int calc_energy(int **matrix){
   return sum;
 }
 
-int calc_homogeneity(int **matrix){
+double calc_homogeneity(int **matrix){
   int module, i, j;
-  int sum = 0;
+  double sum = 0;
   for (i = 0; i < 256; i++) {
     for (j = 0; j < 256; j++) {
       module = pow((i-j), 2.0);
@@ -262,8 +263,9 @@ int calc_homogeneity(int **matrix){
   return sum;
 }
 
-int calc_contrast(int **matrix){
-    int result, i, j, sum = 0;
+double calc_contrast(int **matrix){
+    int result, i, j;
+    double sum = 0;
     for(i = 0; i < 256; i++) {
         for(j = 0; j < 256; j++) {
           result = (pow((i - j), 2.0)* matrix[i][j]);

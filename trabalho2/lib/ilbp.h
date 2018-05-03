@@ -1,7 +1,7 @@
 #ifndef _ILBP_H_
 #define _ILBP_H_
 
-void ILBP(int **, int, int, int*);
+void ILBP(int **, int, int, double*);
 int** matrix_reduced(int**, int, int);
 void print(int **, int, int);
 double calc_average(int**);

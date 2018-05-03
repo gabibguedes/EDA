@@ -3,7 +3,7 @@
 #include "ilbp.h"
 #include "bin_operations.h"
 
-void ILBP(int **matrix, int lines, int columns, int *super_vector){
+void ILBP(int **matrix, int lines, int columns, double *super_vector){
   int **little_matrix, **binary_matrix, *binary_vector, dec_value, small_value;
   for (int l = 1; l < lines - 1; l++) {
     for (int c = 1; c < columns - 1; c++) {

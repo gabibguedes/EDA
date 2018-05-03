@@ -10,25 +10,22 @@ void vector_normalize(double *vector){
       bigger = vector[j];
   }
   for (int k = 0; k < 5; k++) {
-    printf("%lf\n", vector[k]/bigger);
+    vector[k] = (vector[k]/bigger);
   }
+
 }
 
 
 
 double vector_distance(double *vector, double *average_vector){
-
   double distance = 0;
+  
   for (int i = 0; i < 5; i++) {
-    distance += (vector[i] - average_vector[i]) * (vector[i] - average_vector[i]);
+    distance += pow((vector[i]-average_vector[i]), 2.0);
   }
-  distance = sqrt(distance);
-
-
+  distance = pow(distance, 0.5);
   return distance;
-
 }
-
 
 void vector_classification(double *vector, double *average_asphalt_vector, double *average_grass_vector){
 
@@ -40,6 +37,7 @@ void vector_classification(double *vector, double *average_asphalt_vector, doubl
 }
 
 
+
 int main(int argc, char const *argv[]) {
 
   double vector[5]={1, 2, 3, 4, 5};
@@ -47,6 +45,11 @@ int main(int argc, char const *argv[]) {
   double average_asphalt_vector[5]={1, 3, 4, 5, 6};
 
   vector_normalize(vector);
+  printf("Vetor normalizado\n");
+  for (int i = 0; i < 5; i++) {
+    printf("%lf ", vector[i]);
+  }
+
 
   vector_classification(vector, average_asphalt_vector, average_grass_vector);
 
