@@ -2,34 +2,20 @@
 #include <stdlib.h>
 
 
-double vector_average(double** super_matrix){
+double* vector_average(double** super_matrix){
+  double*vector = (double*) calloc(537, sizeof(double));
 
-  double*vector = (double*) calloc(5, sizeof(double));
-
-  printf("testando o print da matriz\n");
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 5; j++) {
-      printf("%lf ", super_matrix[i][j]);
-    }
-    printf("\n");
-  }
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 5; j++) {
+  for (int i = 0; i < 100; i++) {
+    for (int j = 0; j < 537; j++) {
       vector[j]+= super_matrix[i][j];
     }
   }
 
-  for (int i = 0; i < 5; i++) {
-    vector[i]=vector[i]/3;
+  for (int i = 0; i < 537; i++) {
+    vector[i]=vector[i]/100;
   }
-  printf("\nVetorMédia\n\n");
-  for (int k = 0; k < 5; k++) {
-    printf("%lf ", vector[k]);
-  }
-
-
+  return vector;
 }
-
 
 
 

@@ -3,5 +3,8 @@
 
 void ILBP_GLCM_vector(double*, double*, int);
 void vector_normalize(double *);
+int vector_classification(double *, double *, double *);
+double vector_distance(double *, double *);
+double* vector_average(double**);
 
 #endif

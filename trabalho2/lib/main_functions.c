@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "main_functions.h"
 #include "file_manipulation.h"
@@ -41,14 +42,28 @@ void ILBP_GLCM_vector(double *super_vector_asphalt, double* super_vector_grass, 
 
 void vector_normalize(double *vector){
   double bigger = 0;
+  double smaller = 127444;
 
   for (int j = 0; j < 537; j++) {
     if (vector[j]>bigger)
       bigger = vector[j];
   }
-  for (int k = 0; k < 537; k++) {
-    vector[k] = (vector[k]/bigger);
+  for (int j = 0; j < 5; j++) {
+    if (vector[j]<smaller)
+      smaller = vector[j];
   }
+  for (int k = 0; k < 537; k++) {
+    vector[k] = (vector[k]-smaller)/(bigger-smaller);
+  }
+}
+
+int vector_classification(double *vector, double *average_asphalt_vector, double *average_grass_vector){
+
+  if (vector_distance(vector, average_asphalt_vector) < vector_distance(vector, average_grass_vector))
+    return 1;
+  else
+    return 0;
+
 }
 
 double vector_distance(double *vector, double *average_vector){
@@ -59,4 +74,19 @@ double vector_distance(double *vector, double *average_vector){
   }
   distance = pow(distance, 0.5);
   return distance;
+}
+
+double* vector_average(double** super_matrix){
+  double*vector = (double*) calloc(537, sizeof(double));
+
+  for (int i = 0; i < 25; i++) {
+    for (int j = 0; j < 537; j++) {
+      vector[j]+= super_matrix[i][j];
+    }
+  }
+
+  for (int i = 0; i < 537; i++) {
+    vector[i]=vector[i]/25;
+  }
+  return vector;
 }
