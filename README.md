@@ -1,6 +1,17 @@
-# Repositório de EDA
+# Estrutura de Dados 1 - Trabalho 2
 
-## Trabalho 2:
+##### Discentes
+* Felipe Campos de Almeida, 16/0119553
+* Gabriela Barrozo Guedes, 16/0121612
+* Helena Bretas Goulart, 16/0124034
+
+## Instruções para compilação
+
+A primeira etapa é baixar a biblioteca ncurses.h, como demonstrado abaixo:
+
+```
+sudo apt-get install libncurses5-dev
+```
 
 Em nosso trabalho, temos as bibliotecas na pasta lib/, os arquivos .o na pasta obj/  e os executaveis na pasta bin/
 
@@ -30,12 +41,6 @@ gcc projeto2.c obj/file_manipulation.o obj/bin_operations.o obj/ilbp.o obj/glcm.
 bin/a.out
 
 ```
-
-## OBS: Em caso de problemas com a biblioteca ncourses.h baixe libncurses5 em seu computador 
-```
-sudo apt-get install libncurses5-dev
-```
-
 
 ##### Referência para criação de bibliotecas:
 
