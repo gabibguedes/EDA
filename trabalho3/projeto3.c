@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 #define FILE_NAME "contatos.txt"
 
 typedef struct {
@@ -15,16 +17,15 @@ typedef struct {
 Contact* read_contact_list();
 Contact* insertion_sort(Contact*, Contact*);
 void see_all(Contact*);
+void menu(Contact*);
+void menu_options();
 
 int main() {
-/*
-  while(1){
-    menu();
-  }
-*/
  Contact *contatinho;
  contatinho = read_contact_list();
- see_all(contatinho);
+ while(1){
+   menu(contatinho);
+ }
   return 0;
 }
 
@@ -58,6 +59,8 @@ Contact* read_contact_list(){
     firstContact = insertion_sort(lastContact, new_contact);
     lastContact = new_contact;
   }
+
+  firstContact = firstContact->next;
 
   fclose(fp);
   return firstContact;
@@ -134,16 +137,28 @@ Contact* insertion_sort( Contact* reference,  Contact* new_contact){
 
 void see_all(Contact *contatinho){
   //Method to see all contact in alphabetical order
-  while (contatinho != NULL) {
-    printf("NOME: %s\n",contatinho->name );
-    printf("TELEFONE: %s\n", contatinho->phone);
-    printf("ENDEREÇO: %s\n", contatinho->address);
-    printf("CEP: %d\n", contatinho->cep);
-    printf("ANIVERSÁRIO: %s\n", contatinho->birthday);
-    printf("next: %p\n", contatinho->next);
-    printf("before: %p\n\n", contatinho->before);
+  int seeing = 1, i=0;
+  char input;
+  system("clear");
 
+  printf("====== CONTATOS ======\n\n");
+
+
+  while (contatinho != NULL) {
+    printf("%s --",contatinho->name );
+    printf(" %s\n", contatinho->phone);
+
+    i++;
     contatinho = contatinho->next;
+  }
+  while(seeing){
+    printf("\n\nAperte M para voltar ao menu inicial\n\n");
+    scanf(" %c", &input);
+    if (input == 'm' || input == 'M') {
+      seeing = 0;
+    }else{
+      printf("Insira uma opção valida");
+    }
   }
 }
 /*
@@ -160,18 +175,19 @@ void search_contact(char name[100]){
 }
 
 
+*/
 void menu_options(){
   system("clear");
+  printf("======== MENU ========\n\n");
   printf ("Seja bem-vindo a lista telefonica!\n\n");
-  printf("====== MENU ======\n");
   printf("1- Inserir novo registro\n");
   printf("2- Remover registro\n");
   printf ("3- Visualizar registro\n");
   printf ("4- Visualizar registros em ordem alfabetica\n");
-  printf ("5- Sair\n");
+  printf ("5- Sair\n\n");
 }
 
-void menu(){
+void menu(Contact *contact_list){
   int value;
 
   menu_options();
@@ -179,19 +195,25 @@ void menu(){
 
   switch (value){
      case 1:
-	    // chamada da funcao
+	    printf("Ainda não implementado:( \n");
+      sleep(1);
+      menu(contact_list);
       break;
 
-     case 2:
-	    // chamada da funcao
+    case 2:
+      printf("Ainda não implementado:( \n");
+      sleep(1);
+      menu(contact_list);
       break;
 
      case 3:
-	    // chamada da funcao
-      break;
+     printf("Ainda não implementado:( \n");
+     sleep(1);
+     menu(contact_list);
+     break;
 
     case 4:
-	    // chamada da funcao
+	    see_all(contact_list);
       break;
 
      case 5:
@@ -203,4 +225,3 @@ void menu(){
   }
 
 }
-*/
