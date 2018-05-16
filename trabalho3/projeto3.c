@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #define FILE_NAME "contatos.txt"
 
@@ -19,13 +20,14 @@ Contact* insertion_sort(Contact*, Contact*);
 void see_all(Contact*);
 void menu(Contact*);
 void menu_options();
+void add_contact(Contact *);
+void search_contact(Contact*);
 
 int main() {
  Contact *contatinho;
  contatinho = read_contact_list();
- while(1){
-   menu(contatinho);
- }
+  menu(contatinho);
+
   return 0;
 }
 
@@ -34,7 +36,7 @@ Contact* read_contact_list(){
   char dolar;
 
   FILE *fp;
-  fp = fopen(FILE_NAME, "r");
+  fp = fopen(FILE_NAME, "a+");
   lastContact = NULL;
 
   while(!feof(fp)){
@@ -135,21 +137,25 @@ Contact* insertion_sort( Contact* reference,  Contact* new_contact){
     return firstContact;
 }
 
-void see_all(Contact *contatinho){
+void see_all(Contact *contact_list){
   //Method to see all contact in alphabetical order
   int seeing = 1, i=0;
   char input;
+  Contact *contact = contact_list;
   system("clear");
 
   printf("====== CONTATOS ======\n\n");
 
+  if (contact_list == NULL) {
+    printf("\n\nVocê ainda não possui contatos :(\n");
+  }
 
-  while (contatinho != NULL) {
-    printf("%s --",contatinho->name );
-    printf(" %s\n", contatinho->phone);
+  while (contact != NULL) {
+    printf("%s --",contact->name );
+    printf(" %s\n", contact->phone);
 
     i++;
-    contatinho = contatinho->next;
+    contact = contact->next;
   }
   while(seeing){
     printf("\n\nAperte M para voltar ao menu inicial\n\n");
@@ -160,19 +166,102 @@ void see_all(Contact *contatinho){
       printf("Insira uma opção valida");
     }
   }
+  menu(contact_list);
 }
-/*
-void add_contact( Contact new_contact){
+void add_contact(Contact *contact_list){
   //Method to add a new contact to the list
+  Contact new_contact, *firstContact;
+
+  new_contact.next = NULL;
+  new_contact.before = NULL;
+
+  system("clear");
+  printf("==== NOVO CONTATO ====\n\n");
+  getchar();
+  printf("Nome: ");
+  scanf("%[^\n]", new_contact.name);
+  getchar();
+
+  printf("Telefone (XXXXX-XXXX): ");
+  scanf("%s", new_contact.phone);
+  getchar();
+
+  printf("Endereço: ");
+  scanf("%[^\n]", new_contact.address);
+
+  printf("Cep: ");
+  scanf("%d", &new_contact.cep);
+
+  getchar();
+  printf("Aniversário (DD/MM/AAAA): ");
+  scanf("%[^\n]", new_contact.birthday);
+
+  insertion_sort(contact_list, &new_contact);
+
+  FILE *fp;
+  fp = fopen(FILE_NAME, "a+");
+  fprintf(fp, "%s\n", new_contact.name);
+  fprintf(fp, "%s\n", new_contact.phone);
+  fprintf(fp, "%s\n", new_contact.address);
+  fprintf(fp, "%d\n", new_contact.cep);
+  fprintf(fp, "%s\n", new_contact.birthday);
+  fprintf(fp, "$\n");
+  fclose(fp);
+  firstContact = read_contact_list();
+  menu(firstContact);
+
 }
+
+void search_contact(Contact *contact_list){
+  //Method to serch and show the contacts with the selected name
+  Contact *selected = contact_list;
+  char name[101], input;
+  int seeing=1, found=0;
+
+  system("clear");
+  printf("=== BUSCAR CONTATO ===\n\n");
+  getchar();
+  printf("Nome: ");
+  scanf("%[^\n]", name);
+  getchar();
+
+  while(selected != NULL){
+    if (!strcmp(selected->name, name)) {
+      printf("\n\n%s\n", selected->name);
+      printf("%s\n\n", selected->phone);
+      printf("Endereço: ");
+      printf("%s\n", selected->address);
+      printf("CEP: ");
+      printf("%d\n", selected->cep);
+      printf("Aniversário: ");
+      printf("%s\n", selected->birthday);
+      found = 1;
+    }
+    selected = selected->next;
+  }
+
+  if(!found){
+    printf("\n\nERRO 404 Contato não encontrado :(\n");
+  }
+
+  while(seeing){
+    printf("\n\nAperte M para voltar ao menu inicial\n\n");
+    scanf(" %c", &input);
+    if (input == 'm' || input == 'M') {
+      seeing = 0;
+    }else{
+      printf("Insira uma opção valida");
+    }
+  }
+  menu(contact_list);
+}
+
+/*
 
 void remove_contact(char name[100]){
   //Method to remove a contact from the list
 }
 
-void search_contact(char name[100]){
-  //Method to serch and show the contacts with the selected name
-}
 
 
 */
@@ -195,9 +284,7 @@ void menu(Contact *contact_list){
 
   switch (value){
      case 1:
-	    printf("Ainda não implementado:( \n");
-      sleep(1);
-      menu(contact_list);
+	    add_contact(contact_list);
       break;
 
     case 2:
@@ -207,9 +294,7 @@ void menu(Contact *contact_list){
       break;
 
      case 3:
-     printf("Ainda não implementado:( \n");
-     sleep(1);
-     menu(contact_list);
+     search_contact(contact_list);
      break;
 
     case 4:
@@ -222,6 +307,10 @@ void menu(Contact *contact_list){
 
      default :
       printf ("Por favor, insira uma opcao valida!\n");
+      getchar();
+      sleep(2);
+      menu(contact_list);
+      break;
   }
 
 }
