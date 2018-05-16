@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define FILE_NAME "contatos2.txt"
+#define FILE_NAME "contatos.txt"
 
 typedef struct {
   char name[101];
@@ -12,7 +12,7 @@ typedef struct {
   struct Contact *before;
 } Contact;
 
-Contact read_contact_list();
+Contact* read_contact_list();
 Contact* insertion_sort(Contact*, Contact*);
 void see_all(Contact*);
 
@@ -22,76 +22,59 @@ int main() {
     menu();
   }
 */
-printf("1\n");
- Contact contatinho, *contatinho2;
- printf("2\n");
+printf("main\n");
+ Contact *contatinho;
  contatinho = read_contact_list();
- printf("4\n");
-
-
-
+ printf("voltou do read\n");
+ see_all(contatinho);
   return 0;
 }
 
-Contact read_contact_list(){
-  Contact *firstContact, nextContact, lastContact;
+Contact* read_contact_list(){
+  Contact *firstContact, *nextContact, *lastContact;
   char dolar;
 
   FILE *fp;
   fp = fopen(FILE_NAME, "r");
+  lastContact = NULL;
+  printf("abriu arquivo\n");
 
-  fscanf(fp, "%[^\n]", lastContact.name);
-  getc(fp);
-  fscanf(fp, "%s", lastContact.phone);
-  getc(fp);
-  fscanf(fp, "%[^\n]", lastContact.address);
-  fscanf(fp, "%d", &lastContact.cep);
-  getc(fp);
-  fscanf(fp, "%s", lastContact.birthday);
-  getc(fp);
-  fscanf(fp, "%c", &dolar);
-  getc(fp);
+  while(!feof(fp)){
+    Contact *new_contact;
+    new_contact = malloc(sizeof(Contact));
 
-  printf("NOME: %s\n",lastContact.name );
-  printf("TELEFONE: %s\n", lastContact.phone);
-  printf("ENDEREÇO: %s\n", lastContact.address);
-  printf("CEP: %d\n", lastContact.cep);
-  printf("ANIVERSÁRIO: %s\n\n", lastContact.birthday);
-
-
-  lastContact.next = NULL;
-  lastContact.before = NULL;
-
-  //while(!feof(fp)){
-    fscanf(fp, "%[^\n]", nextContact.name);
+    fscanf(fp, "%[^\n]", new_contact->name);
     getc(fp);
-    fscanf(fp, "%s", nextContact.phone);
+    fscanf(fp, "%s", new_contact->phone);
     getc(fp);
-    fscanf(fp, "%[^\n]", nextContact.address);
-    fscanf(fp, "%d", &nextContact.cep);
+    fscanf(fp, "%[^\n]", new_contact->address);
+    fscanf(fp, "%d", &new_contact->cep);
     getc(fp);
-    fscanf(fp, "%s", nextContact.birthday);
+    fscanf(fp, "%s", new_contact->birthday);
     getc(fp);
     fscanf(fp, "%c", &dolar);
     getc(fp);
 
-    nextContact.next = NULL;
-    nextContact.before = NULL;
+    new_contact->next = NULL;
+    new_contact->before = NULL;
 
-    printf("NOME: %s\n",nextContact.name );
-    printf("TELEFONE: %s\n", nextContact.phone);
-    printf("ENDEREÇO: %s\n", nextContact.address);
-    printf("CEP: %d\n", nextContact.cep);
-    printf("ANIVERSÁRIO: %s\n\n", nextContact.birthday);
+    printf("NOME: %s\n",new_contact->name );
+    printf("TELEFONE: %s\n", new_contact->phone);
+    printf("ENDEREÇO: %s\n", new_contact->address);
+    printf("CEP: %d\n", new_contact->cep);
+    printf("ANIVERSÁRIO: %s\n", new_contact->birthday);
+    printf("next: %p\n", new_contact->next);
+    printf("before: %p\n", new_contact->before);
 
-    firstContact = insertion_sort(&lastContact, &nextContact);
-    lastContact = nextContact;
-   //}
+    printf("%p\n", lastContact);
+    printf("%p\n\n", new_contact);
+
+    firstContact = insertion_sort(lastContact, new_contact);
+    lastContact = new_contact;
+  }
 
   fclose(fp);
-  see_all(firstContact);
-
-  return *firstContact;
+  return firstContact;
 }
 
 Contact* insertion_sort( Contact* old_contact,  Contact* new_contact){
@@ -101,6 +84,9 @@ Contact* insertion_sort( Contact* old_contact,  Contact* new_contact){
   Contact *reference = old_contact, *firstContact = old_contact, *before, *next;
   int searching = 1, bigger = 0, smaller = 0, sameletter = 1, i;
 
+  if (old_contact == NULL) {
+    return new_contact;
+  }
   if (new_contact->name[0] > 97) {
     new_contact->name[0] -= 32;
   }
@@ -131,7 +117,6 @@ Contact* insertion_sort( Contact* old_contact,  Contact* new_contact){
       }else if(reference->name[i] < new_contact->name[i]){
         sameletter = 0;
         bigger = 1;
-        printf("%d e %d\n",smaller, bigger );
         if ((smaller && bigger) || (bigger && reference->next == NULL)) {
           searching = 0;
           new_contact->next = reference->next;
@@ -165,8 +150,7 @@ Contact* insertion_sort( Contact* old_contact,  Contact* new_contact){
 
 void see_all(Contact *contatinho){
   //Method to see all contact in alphabetical order
-  while (contatinho->next != NULL) {
-    printf("endereço da variavel: %p\n", contatinho);
+  while (contatinho != NULL) {
     printf("NOME: %s\n",contatinho->name );
     printf("TELEFONE: %s\n", contatinho->phone);
     printf("ENDEREÇO: %s\n", contatinho->address);
@@ -177,15 +161,6 @@ void see_all(Contact *contatinho){
 
     contatinho = contatinho->next;
   }
-
-  printf("NOME: %s\n",contatinho->name );
-  printf("TELEFONE: %s\n", contatinho->phone);
-  printf("ENDEREÇO: %s\n", contatinho->address);
-  printf("CEP: %d\n", contatinho->cep);
-  printf("ANIVERSÁRIO: %s\n", contatinho->birthday);
-  printf("next: %p\n", contatinho->next);
-  printf("before: %p\n", contatinho->before);
-
 }
 /*
 void add_contact( Contact new_contact){
