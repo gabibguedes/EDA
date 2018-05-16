@@ -22,10 +22,8 @@ int main() {
     menu();
   }
 */
-printf("main\n");
  Contact *contatinho;
  contatinho = read_contact_list();
- printf("voltou do read\n");
  see_all(contatinho);
   return 0;
 }
@@ -37,7 +35,6 @@ Contact* read_contact_list(){
   FILE *fp;
   fp = fopen(FILE_NAME, "r");
   lastContact = NULL;
-  printf("abriu arquivo\n");
 
   while(!feof(fp)){
     Contact *new_contact;
@@ -58,17 +55,6 @@ Contact* read_contact_list(){
     new_contact->next = NULL;
     new_contact->before = NULL;
 
-    printf("NOME: %s\n",new_contact->name );
-    printf("TELEFONE: %s\n", new_contact->phone);
-    printf("ENDEREÇO: %s\n", new_contact->address);
-    printf("CEP: %d\n", new_contact->cep);
-    printf("ANIVERSÁRIO: %s\n", new_contact->birthday);
-    printf("next: %p\n", new_contact->next);
-    printf("before: %p\n", new_contact->before);
-
-    printf("%p\n", lastContact);
-    printf("%p\n\n", new_contact);
-
     firstContact = insertion_sort(lastContact, new_contact);
     lastContact = new_contact;
   }
@@ -77,21 +63,21 @@ Contact* read_contact_list(){
   return firstContact;
 }
 
-Contact* insertion_sort( Contact* old_contact,  Contact* new_contact){
+Contact* insertion_sort( Contact* reference,  Contact* new_contact){
 //This method adds a new contact to the list (in alphabetical order) and
 //returns the first element of the list
 
-  Contact *reference = old_contact, *firstContact = old_contact, *before, *next;
+  Contact *firstContact = reference;
   int searching = 1, bigger = 0, smaller = 0, sameletter = 1, i;
 
-  if (old_contact == NULL) {
+  if (reference == NULL) {
     return new_contact;
   }
   if (new_contact->name[0] > 97) {
     new_contact->name[0] -= 32;
   }
-
   while(searching){
+    sameletter = 1;
     if (reference->name[0] > 97) {
       reference->name[0] -= 32;
     }
@@ -124,11 +110,11 @@ Contact* insertion_sort( Contact* old_contact,  Contact* new_contact){
           reference->next = new_contact;
 
           if(new_contact->next != NULL){
-            reference = new_contact->next;
+              reference = new_contact->next;
             reference->before = new_contact;
           }
         }else{
-          reference = reference->before;
+          reference = reference->next;
         }
       }
       i++;
@@ -143,9 +129,7 @@ Contact* insertion_sort( Contact* old_contact,  Contact* new_contact){
       reference = reference->before;
     }
   }
-  //see_all(firstContact);
-
-  return firstContact;
+    return firstContact;
 }
 
 void see_all(Contact *contatinho){
