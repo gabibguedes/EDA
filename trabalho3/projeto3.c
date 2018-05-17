@@ -46,13 +46,14 @@ void print_addres(Contact* firstContact){
 
 
 Contact* read_contact_list(){
-  Contact *firstContact, *nextContact, *lastContact;
+  Contact *firstContact, *lastContact;
   char dolar;
 
   FILE *fp;
   fp = fopen(FILE_NAME, "a+");
 
   lastContact = NULL;
+  firstContact = NULL;
 
   while(!feof(fp)){
     Contact *new_contact;
@@ -77,8 +78,24 @@ Contact* read_contact_list(){
     lastContact = new_contact;
   }
   fclose(fp);
-  firstContact = firstContact->next;
-  firstContact->before = NULL;
+
+  if ((firstContact->name == NULL ) || !(strcmp(firstContact->name, "")) ){
+    firstContact = firstContact->next;
+    firstContact->before = NULL;
+  }
+  Contact * last = firstContact, *c;
+  while (last->next != NULL) {
+    if ((last->phone == NULL ) || (!strcmp(last->phone, ""))) {
+      c = last->next;
+      last = last->before;
+      last->next = c;
+    }
+    last = last->next;
+  }
+  if ((last->phone == NULL ) || (!strcmp(last->phone, ""))) {
+    last = last->before;
+    last->next = NULL;
+  }
 
   return firstContact;
 }
@@ -156,6 +173,7 @@ void see_all(Contact *contact_list){
   //Method to see all contact in alphabetical order
   int seeing = 1, i=0;
   char input;
+  contact_list = read_contact_list();
   Contact *contact = contact_list;
   system("clear");
 
@@ -243,7 +261,7 @@ void search_contact(Contact *contact_list){
   while(selected != NULL){
     if (!strcmp(selected->name, name)) {
       printf("\n\n%s\n", selected->name);
-      printf("%s\n\n", selected->phone);
+      printf("%s\n", selected->phone);
       printf("Endereço: ");
       printf("%s\n", selected->address);
       printf("CEP: ");
@@ -286,6 +304,11 @@ void remove_contact(Contact *contact_list){
 
   while(selected != NULL){
     if (!strcmp(selected->name, name)) {
+      strcpy(selected->name, "");
+      strcpy(selected->phone, "");
+      strcpy(selected->address, "");
+      strcpy(selected->birthday, "");
+
       if (selected->before != NULL) {
         neighbor = selected->before;
         neighbor->next = selected->next;
@@ -331,10 +354,15 @@ void remove_contact(Contact *contact_list){
 }
 
 void new_file(Contact * contact_list){
-  Contact *new_contact = contact_list;
+  Contact *new_contact = contact_list, *c;
   FILE *fp;
   fp = fopen(FILE_NAME, "w+");
   while (new_contact != NULL) {
+    if ((new_contact->phone == NULL ) || (!strcmp(new_contact->phone, ""))) {
+      c = new_contact->next;
+      new_contact = new_contact->before;
+      new_contact->next = c;
+    }
     fprintf(fp, "%s\n", new_contact->name);
     fprintf(fp, "%s\n", new_contact->phone);
     fprintf(fp, "%s\n", new_contact->address);
@@ -352,7 +380,7 @@ void menu_options(){
   printf ("Seja bem-vindo a lista telefonica!\n\n");
   printf("1- Inserir novo registro\n");
   printf("2- Remover registro\n");
-  printf ("3- Visualizar registro\n");
+  printf ("3- Visualizar registro selecionado\n");
   printf ("4- Visualizar registros em ordem alfabetica\n");
   printf ("5- Sair\n\n");
 }
