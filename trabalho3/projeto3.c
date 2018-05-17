@@ -22,6 +22,9 @@ void menu(Contact*);
 void menu_options();
 void add_contact(Contact *);
 void search_contact(Contact*);
+void print_addres(Contact*);
+void remove_contact(Contact*);
+void new_file(Contact*);
 
 int main() {
  Contact *contatinho;
@@ -30,6 +33,17 @@ int main() {
 
   return 0;
 }
+void print_addres(Contact* firstContact){
+  Contact * first = firstContact;
+  while (first != NULL) {
+    printf("%s\n", first->name);
+    printf("end. anterior: %p\n", first->before);
+    printf("end. atual:    %p\n", first);
+    printf("end. proximo:  %p\n\n", first->next);
+    first = first->next;
+  }
+}
+
 
 Contact* read_contact_list(){
   Contact *firstContact, *nextContact, *lastContact;
@@ -37,6 +51,7 @@ Contact* read_contact_list(){
 
   FILE *fp;
   fp = fopen(FILE_NAME, "a+");
+
   lastContact = NULL;
 
   while(!feof(fp)){
@@ -61,10 +76,10 @@ Contact* read_contact_list(){
     firstContact = insertion_sort(lastContact, new_contact);
     lastContact = new_contact;
   }
-
-  firstContact = firstContact->next;
-
   fclose(fp);
+  firstContact = firstContact->next;
+  firstContact->before = NULL;
+
   return firstContact;
 }
 
@@ -256,15 +271,81 @@ void search_contact(Contact *contact_list){
   menu(contact_list);
 }
 
-/*
-
-void remove_contact(char name[100]){
+void remove_contact(Contact *contact_list){
   //Method to remove a contact from the list
+  char name[101], answer;
+  Contact *selected = contact_list, *neighbor;
+  int removed=0, seeing=1;
+
+  system("clear");
+  printf("=== REMOVER CONTATO ==\n\n");
+  printf("Nome: ");
+  getchar();
+  scanf("%[^\n]", name);
+  getchar();
+
+  while(selected != NULL){
+    if (!strcmp(selected->name, name)) {
+      if (selected->before != NULL) {
+        neighbor = selected->before;
+        neighbor->next = selected->next;
+      }else if(selected->before == NULL){
+        contact_list = selected->next;
+        contact_list->before = NULL;
+      }
+
+      if (selected->next != NULL) {
+        neighbor = selected->next;
+        neighbor->before = selected->before;
+      }
+      free(selected);
+      removed ++;
+    }
+    selected = selected->next;
+  }
+  if(removed == 0){
+    printf("\n\nERRO 404 Contato não encontrado!\n");
+    sleep(2);
+  }else{
+
+    while(seeing){
+      printf("\n\nDeseja mesmo remover %d contato(s)? (S/N)\n", removed);
+      scanf("%c", &answer);
+      if (answer == 's' || answer == 'S') {
+        new_file(contact_list);
+
+        printf("\nContato(s) removido(s) com sucesso!\n");
+        sleep(2);
+        seeing = 0;
+      }else if(answer == 'n' || answer == 'N'){
+        printf("\nOperação cancelada.\n");
+        sleep(2);
+        seeing = 0;
+      }else{
+        printf("\n\nInsira uma opção valida\n");
+      }
+    }
+  }
+  contact_list = read_contact_list();
+  menu(contact_list);
 }
 
+void new_file(Contact * contact_list){
+  Contact *new_contact = contact_list;
+  FILE *fp;
+  fp = fopen(FILE_NAME, "w+");
+  while (new_contact != NULL) {
+    fprintf(fp, "%s\n", new_contact->name);
+    fprintf(fp, "%s\n", new_contact->phone);
+    fprintf(fp, "%s\n", new_contact->address);
+    fprintf(fp, "%d\n", new_contact->cep);
+    fprintf(fp, "%s\n", new_contact->birthday);
+    fprintf(fp, "$\n");
+    new_contact = new_contact->next;
+  }
+  fclose(fp);
+}
 
-
-*/
 void menu_options(){
   system("clear");
   printf("======== MENU ========\n\n");
@@ -288,9 +369,7 @@ void menu(Contact *contact_list){
       break;
 
     case 2:
-      printf("Ainda não implementado:( \n");
-      sleep(1);
-      menu(contact_list);
+      remove_contact(contact_list);
       break;
 
      case 3:
