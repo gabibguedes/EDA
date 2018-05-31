@@ -228,9 +228,19 @@ char flight_status(int *arrivals, int *take_off) {
 		 // verifica_zeros --> chamar uma função aki
 		 	//no_fuel(airplane);
 		 	if (using_runway(track1, airplane, list)){
+				printf("\nTRACK1\n");
+				printf("\tcode: %s\n", track1->airplane->code);
+				printf("\tstatus: %c\n", track1->airplane->status);
+				printf("\tindex: %d\n", track1->airplane->index);
+				printf("\tfuel: %d\n", track1->airplane->fuel);
 				airplane = airplane->next;
 			}
 		 	if(using_runway(track2, airplane, list)){
+				printf("\nTRACK2\n");
+				printf("\tcode: %s\n", track2->airplane->code);
+				printf("\tstatus: %c\n", track2->airplane->status);
+				printf("\tindex: %d\n", track2->airplane->index);
+				printf("\tfuel: %d\n", track2->airplane->fuel);
 				airplane = airplane->next;
 			}
 			// if (track3.airplane == NULL) {
@@ -244,19 +254,9 @@ char flight_status(int *arrivals, int *take_off) {
 			time_passed += TIME_UNITY;
 
 			if (track1->time_of_use == 0) {
-				printf("\nTRACK1\n");
-				printf("\tcode: %s\n", track1->airplane->code);
-				printf("\tstatus: %c\n", track1->airplane->status);
-				printf("\tindex: %d\n", track1->airplane->index);
-				printf("\tfuel: %d\n", track1->airplane->fuel);
 				track1->airplane = NULL;
 			}
 			if (track2->time_of_use == 0) {
-				printf("\nTRACK2\n");
-				printf("\tcode: %s\n", track2->airplane->code);
-				printf("\tstatus: %c\n", track2->airplane->status);
-				printf("\tindex: %d\n", track2->airplane->index);
-				printf("\tfuel: %d\n", track2->airplane->fuel);
 				track2->airplane = NULL;
 			}
 	}
