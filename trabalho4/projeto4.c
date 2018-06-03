@@ -35,7 +35,8 @@ void print_action(Runway *, int);
 Flight* managing_track3(Runway *, Runway *, Runway *, Flight *, int);
 void get_hour(int);
 void print_airport(Flight *, int, int, int);
-void print_alert_crashing(Flight *);
+void print_alert_crashing(Flight *, int);
+void print_alert_detour(Runway *, int);
 
 int main() {
 	Flight *first_flight;
@@ -106,7 +107,7 @@ void print_flights(Flight* first) {
 		}else{
 			printf(" D ");
 		}
-		printf(" %.2d]", element->fuel);
+		printf("- %.2d]", element->fuel);
 		element = element->next;
 	}
 }
@@ -289,15 +290,14 @@ int using_runway(Runway *track, Flight *airplane){
 			 if (airplane->status == 'A' && airplane->fuel == 0) {
 				 if (track3->airplane == NULL) {
 					//1o elemento pousa
-					printf("\nALERTA GERAL DE DESVIO DE AERONAVE");
 					track3->airplane = airplane;
 					track3->time_of_use = landing;
-					print_action(track3, time_passed);
+					print_alert_detour(track3, time_passed);
 					airplane = airplane->next;
 					// pouso de emergência
 					return airplane;
 				}else{
-					print_alert_crashing(airplane);
+					print_alert_crashing(airplane, time_passed);
 					airplane = airplane->next;
 					return airplane;
 				}
@@ -314,14 +314,14 @@ int using_runway(Runway *track, Flight *airplane){
 						 airplane = element;//primeiro elemento = B
 
 						 if (track3->airplane == NULL) {
-							printf("\nALERTA GERAL DE DESVIO DE AERONAVE");
+							print_alert_detour(track3, time_passed);
 							track3->airplane = airplane;
 							track3->time_of_use = landing;
 							print_action(track3, time_passed);
 							airplane = airplane->next;
 							return airplane;
 						}else{
-							print_alert_crashing(airplane);
+							print_alert_crashing(airplane, time_passed);
 							airplane = airplane->next;
 							return airplane;
 						}
@@ -435,11 +435,21 @@ void get_hour(int time_passed){
 
  }
 
- void print_alert_crashing(Flight *airplane	) {
-	 printf("\n***************************************\n");
+ void print_alert_crashing(Flight *airplane, int time_passed) {
+	 printf("\n****************************************\n");
+	 printf("****************************************\n");
 	 printf("   ALERTA CRÍTICO, AERONAVE IRÁ CAIR   \n");
+	 printf("   Hora do alerta: ");
+	 get_hour(time_passed);
 	 printf("   Código do voo: %s\n", airplane->code);
-	 printf("***************************************\n");
+	 printf("****************************************\n");
+	 printf("****************************************\n");
+ }
+ void print_alert_detour(Runway *track, int time_passed) {
+	 printf("\n****************************************\n");
+	 printf("   ALERTA GERAL DE DESVIO DE AERONAVE   \n");
+	 print_action(track, time_passed);
+	 printf("****************************************\n");
  }
 
  void print_airport(Flight *first_flight, int n_flights, int n_landings, int n_take_offs){
@@ -454,7 +464,7 @@ void get_hour(int time_passed){
 	 printf(" Número de vôos: %d\n", n_flights);
 	 printf(" Número de aproximações: %d\n", n_landings);
 	 printf(" Número de decolagens: %d\n", n_take_offs);
-	 printf("|--------------------------------------------|\n\n");
+	 printf("\n|--------------------------------------------|\n\n");
 	 printf("Listagem de eventos: \n");
 
  }
