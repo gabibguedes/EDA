@@ -216,6 +216,18 @@ void flight_manager(Flight *list){
 		if (track3->airplane != NULL) {
 			track3->time_of_use -= TIME_UNITY;
 		}
+		if (track1->time_of_use == 0) {
+			free(track1->airplane);
+			track1->airplane = NULL;
+		}
+		if (track2->time_of_use == 0) {
+			free(track2->airplane);
+			track2->airplane = NULL;
+		}
+		if (track3->time_of_use == 0) {
+			free(track3->airplane);
+			track3->airplane = NULL;
+		}
 
 	 // verifica_zeros --> chamar uma função aki
 	 airplane = Check_for_no_fuel(airplane);
@@ -237,18 +249,6 @@ void flight_manager(Flight *list){
 			spending_fuel(airplane);
 		}
 
-		if (track1->time_of_use == 0) {
-			free(track1->airplane);
-			track1->airplane = NULL;
-		}
-		if (track2->time_of_use == 0) {
-			free(track2->airplane);
-			track2->airplane = NULL;
-		}
-		if (track3->time_of_use == 0) {
-			free(track3->airplane);
-			track3->airplane = NULL;
-		}
 		time_passed += TIME_UNITY;
 	}
 }
