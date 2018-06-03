@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 
 #define TIME_UNITY 5
+#define GMT (-3)
 
 typedef struct flight_data {
 	char code[7]; //CCIIII
@@ -26,15 +28,23 @@ int get_fuel();
 void include_flight(Flight*, Flight*);
 void print_flights(Flight* );
 void flight_manager(Flight*);
-int using_runway(Runway *, Flight *, Flight *);
-Flight* no_fuel(Flight *);
+int using_runway(Runway *, Flight *);
+Flight* Check_for_no_fuel(Flight *);
+void spending_fuel(Flight *);
+void print_action(Runway *, int);
+Flight* managing_track3(Runway *, Runway *, Runway *, Flight *, int);
+void get_hour(int);
+void print_airport(Flight *, int, int, int);
+void print_alert_crashing(Flight *);
 
 int main() {
-	Flight *first_flight = NULL;
+	Flight *first_flight;
 	int number_of_flights, arrivals, take_off, wrong_number=1;
 	int *p_arrivals, *p_take_off;
 
 	first_flight = (Flight*)(malloc(sizeof(Flight)));
+	first_flight->index = NULL;
+
 	srand(time(NULL));
 
 	//Estabelecendo número de voos de Aterrisagem e decolagem
@@ -48,16 +58,11 @@ int main() {
 	*p_arrivals = arrivals;
 	*p_take_off = take_off;
 
-	printf("arrivals= %d\n", arrivals);
-	printf("take_off= %d\n", take_off);
-	printf("number_of_flights= %d\n\n", number_of_flights);
-
 	for (int i = 0; i < number_of_flights; i++) {
 		set_flight(first_flight, p_arrivals, p_take_off);
 	}
-	print_flights(first_flight);
+	print_airport(first_flight, number_of_flights, arrivals, take_off);
 	flight_manager(first_flight);
-
 	return 0;
 }
 
@@ -82,52 +87,41 @@ Flight set_flight(Flight *flight_list, int* arrivals, int* take_off) {
 	new_flight->fuel = get_fuel();
 	new_flight->next = NULL;
 
-	if (flight_list == NULL) {
+	if (flight_list->index == NULL) {
 		*flight_list = *new_flight;
 	}else{
 		include_flight(new_flight, flight_list);
 	}
 
- }
+}
 
- void print_flights(Flight* first) {
+void print_flights(Flight* first) {
+	//[código do voo – P/D – prioridade]
  	Flight* element = first;
-	int a=0, d=0;
 
 	while (element !=NULL) {
-		printf("\ncode: %s\n", element->code);
-		printf("status: %c\n", element->status);
-		printf("index: %d\n", element->index);
-		printf("fuel: %d\n\n", element->fuel);
-		//
-		// if (element->status == 'A') {
-		// 	a++;
-		// }else if(element->status == 'D'){
-		// 	d++;
-		// }else{
-		// 	printf("Q q tá acontecendu?\n");
-		// }
-		// printf("As=%d\t Ds=%d\n\n", a,d);
+		printf("\n\t[Código do vôo: %s - ", element->code);
+		if(element->status == 'A'){
+			printf(" P ");
+		}else{
+			printf(" D ");
+		}
+		printf(" %.2d]", element->fuel);
 		element = element->next;
 	}
- }
+}
 
  void include_flight(Flight * new_flight, Flight * list){
 	 Flight *element = list;
 	 int not_found = 1;
 
-		while (element != NULL && not_found) {
-
-	 		if (element->next == NULL) {
-	 			element->next = new_flight;
-				not_found = 0;
-
-	 		}else{
-
-				element = element->next;
-
-			}
-
+	 while (element != NULL && not_found) {
+		 if (element->next == NULL) {
+			 element->next = new_flight;
+			 not_found = 0;
+		 }else{
+			 element = element->next;
+		 }
 	 }
  }
 
@@ -135,8 +129,6 @@ Flight set_flight(Flight *flight_list, int* arrivals, int* take_off) {
  int choose_index(Flight *list){
 	 Flight *list_element = list;
 	 int index, equal = 1, found;
-
-
 
 	 while(equal){
 		 index = (rand() % 64);
@@ -153,7 +145,6 @@ Flight set_flight(Flight *flight_list, int* arrivals, int* take_off) {
 			 equal = 0;
 		 }
 	 }
-
 	 return index;
  }
 
@@ -188,19 +179,16 @@ char flight_status(int *arrivals, int *take_off) {
 	return status;
  }
 
- int get_fuel() {
-	 int amount_fuel;
-	 amount_fuel = (rand() % 13);
-	 return amount_fuel;
+int get_fuel() {
+	int amount_fuel;
+	amount_fuel = (rand() % 13);
+	return amount_fuel;
  }
 
- void flight_manager(Flight *list){
+void flight_manager(Flight *list){
 	 int time_passed = 0, count =0 ;
-	 Flight *airplane = list->next, *managed;
+	 Flight *airplane = list, *managed;
 	 Runway *track1, *track2, *track3;
-
-	 int landing = 4 * TIME_UNITY;
-	 int taking_off = 2 * TIME_UNITY;
 
 	 //Iniciando as pistas
 	 track1 = (Runway*)(malloc(sizeof(Runway)));
@@ -218,55 +206,65 @@ char flight_status(int *arrivals, int *take_off) {
 
 	while(airplane != NULL){
 
-		if (track1 != NULL) {
+		if (track1->airplane != NULL) {
 			track1->time_of_use -= TIME_UNITY;
 		}
-		if (track2 != NULL) {
+		if (track2->airplane != NULL) {
 			track2->time_of_use -= TIME_UNITY;
 		}
-
-		 // verifica_zeros --> chamar uma função aki
-		 	if (using_runway(track1, airplane, list)){
-				printf("\nTRACK1\n");
-				printf("\tcode: %s\n", track1->airplane->code);
-				printf("\tstatus: %c\n", track1->airplane->status);
-				printf("\tindex: %d\n", track1->airplane->index);
-				printf("\tfuel: %d\n", track1->airplane->fuel);
-				airplane = airplane->next;
-				count++;
-			}
-		 	if(using_runway(track2, airplane, list)){
-				printf("\nTRACK2\n");
-				printf("\tcode: %s\n", track2->airplane->code);
-				printf("\tstatus: %c\n", track2->airplane->status);
-				printf("\tindex: %d\n", track2->airplane->index);
-				printf("\tfuel: %d\n", track2->airplane->fuel);
-				airplane = airplane->next;
-				count++;
-			}
-			// if (track3.airplane == NULL) {
-			//
-			// }
-
-			time_passed += TIME_UNITY;
-
-			if (track1->time_of_use == 0) {
-				free(track1->airplane);
-				track1->airplane = NULL;
-			}
-			if (track2->time_of_use == 0) {
-				free(track2->airplane);
-				track2->airplane = NULL;
-			}
+		if (track3->airplane != NULL) {
+			track3->time_of_use -= TIME_UNITY;
 		}
-		printf("\n\nNº de AVIOES: %d\n",count );
- }
 
- int using_runway(Runway *track, Flight *airplane, Flight *list){
+	 // verifica_zeros --> chamar uma função aki
+	 airplane = Check_for_no_fuel(airplane);
+
+	 	if (using_runway(track1, airplane)){
+			print_action(track1, time_passed);
+			airplane = airplane->next;
+			count++;
+		}
+	 	if(using_runway(track2, airplane)){
+			print_action(track2, time_passed);
+			airplane = airplane->next;
+			count++;
+		}
+		airplane = managing_track3(track3, track2, track1, airplane, time_passed);
+
+		if((time_passed != 0) && ((time_passed % 50) == 0)){
+			//Diminui o combustivel
+			spending_fuel(airplane);
+		}
+
+		if (track1->time_of_use == 0) {
+			free(track1->airplane);
+			track1->airplane = NULL;
+		}
+		if (track2->time_of_use == 0) {
+			free(track2->airplane);
+			track2->airplane = NULL;
+		}
+		if (track3->time_of_use == 0) {
+			free(track3->airplane);
+			track3->airplane = NULL;
+		}
+		time_passed += TIME_UNITY;
+	}
+}
+
+void spending_fuel(Flight *	first){
+	Flight *element = first;
+	while (element != NULL) {
+		element->fuel -= 1;
+		element = element->next;
+	}
+}
+
+int using_runway(Runway *track, Flight *airplane){
 	 int landing = 4 * TIME_UNITY;
 	 int taking_off = 2 * TIME_UNITY;
 
-	 if (track->airplane == NULL) {
+	 if (track->airplane == NULL && airplane != NULL) {
 		 track->airplane = airplane;
 		 if (airplane->status == 'A') {
 			 track->time_of_use = landing;
@@ -279,31 +277,184 @@ char flight_status(int *arrivals, int *take_off) {
 	 }
  }
 
- //
- // void track3(){
- //
- // }
 
-Flight* no_fuel(Flight *first){
-	 Flight *element = first->next, *before = first;
+ Flight* managing_track3(Runway *track3, Runway *track2, Runway *track1, Flight *airplane, int time_passed){
+	 Flight *element = airplane;
+	 int landing = 4 * TIME_UNITY;
+	 int taking_off = 2 * TIME_UNITY;
 
+	 if (airplane != NULL) {
+		 //Verifica situação de emergencia
+		 if((track1->airplane != NULL) && (track2->airplane != NULL)){
+			 if (airplane->status == 'A' && airplane->fuel == 0) {
+				 if (track3->airplane == NULL) {
+					//1o elemento pousa
+					printf("\nALERTA GERAL DE DESVIO DE AERONAVE");
+					track3->airplane = airplane;
+					track3->time_of_use = landing;
+					print_action(track3, time_passed);
+					airplane = airplane->next;
+					// pouso de emergência
+					return airplane;
+				}else{
+					print_alert_crashing(airplane);
+					airplane = airplane->next;
+					return airplane;
+				}
+			 }else{
+				 Flight *before = airplane;/*Anterior começa pelo 1o*/
+				 element = airplane->next; /*Elemento a ser verificado começa pelo 2o*/
+
+				 while (element != NULL) {
+					 if((element->fuel == 0) && (element->status == 'A')){
+						 // pouso de emergência
+						 //Se B for = 0, temos que conectar A e C
+						 before->next = element->next;//proximo de A = C
+						 element->next = airplane;//proximo de B = A
+						 airplane = element;//primeiro elemento = B
+
+						 if (track3->airplane == NULL) {
+							printf("\nALERTA GERAL DE DESVIO DE AERONAVE");
+							track3->airplane = airplane;
+							track3->time_of_use = landing;
+							print_action(track3, time_passed);
+							airplane = airplane->next;
+							return airplane;
+						}else{
+							print_alert_crashing(airplane);
+							airplane = airplane->next;
+							return airplane;
+						}
+					 }else{
+						 before = before->next; //É incrementado para a lista ser percorrida
+						 element = element->next; //É incrementado para a lista ser percorrida
+					 }
+				 }
+			 }
+		 }
+		 //Proximo a decolar
+		 if(track3->airplane == NULL){
+			 //Verifica 1o
+			 if(airplane->status == 'D'){
+				 track3->airplane = airplane;
+				 track3->time_of_use = taking_off;
+				 print_action(track3, time_passed);
+				 airplane = airplane->next;
+				 return airplane;
+			 }else{
+				 //A partir do 2o
+				 element = airplane->next;
+				 Flight *before = airplane;
+				 while (element != NULL) {
+					 if(element->status == 'D'){
+						 //Se B for = 0, temos que conectar A e C
+						 before->next = element->next;//proximo de A = C
+						 element->next = airplane;//proximo de B = A
+						 airplane = element;//primeiro elemento = B
+
+						 // decola o bixin
+						 track3->airplane = airplane;
+						 track3->time_of_use = taking_off;
+						 print_action(track3, time_passed);
+						 airplane = airplane->next;
+						 return airplane;
+
+					 }else{
+						 before = before->next; //É incrementado para a lista ser percorrida
+						 element = element->next; //É incrementado para a lista ser percorrida
+					 }
+				 }
+			 }
+		 }
+	 }
+	 return airplane;
+}
+
+
+Flight* Check_for_no_fuel(Flight *first){
+	 Flight *element = first->next; /*Começa a partir do 2o*/
+	 Flight *before = first; /*Começa do 1o*/
+
+	 //Vê todos os elementos não nulos
 	 while (element != NULL) {
-	 	if(element->fuel == 0){
-			before->next = element->next;
-			element->next = first;
-			first = element;
-			element = before->next;
-		}else{
-			element = element->next;
-		}
+		 //Se o elemento tiver combustivel = 0
+		 //Vamos pensar em A B C
+		 if((element->fuel == 0) && (element->status == 'A')){
+			 //Se B for = 0, temos que conectar A e C
+			 before->next = element->next;//proximo de A = C
+			 element->next = first;//proximo de B = A
+			 first = element;//primeiro elemento = B
+			 element = before->next;//proximo elemento a ser tratado = C
+			 before = before;
+			 //Como o proximo elemento a ser tratado é o proximo do before,
+			 //o before continua o mesmo.
+		 }else{
+			 before = before->next; //É incrementado para a lista ser percorrida
+			 element = element->next; //É incrementado para a lista ser percorrida
+		 }
+		 // sleep(1);
 	 }
 	 return first;
  }
 
- // int get_hour(){
+void print_action(Runway *runway, int time_passed){
 
-	// char timeStr[9];
- 	// _strtime(timeStr);
- 	//  printf( "%s \n", timeStr);
+	printf("\n");
+	printf("Código do voo: %s\n", runway->airplane->code);
+	printf("Status: ");
+	if(runway->airplane->status == 'A'){
+		printf("aeronave pousou\n");
+	}else{
+		printf("aeronave decolou\n");
+	}
+	printf("Horário do início do procedimento: ");
+	get_hour(time_passed);
+	printf("Número da pista: %d\n", runway->id);
+}
 
- // }
+void get_hour(int time_passed){
+	int hours, min;
+
+
+	time_t raw_time;
+  struct tm *flight_time;
+	time ( &raw_time );
+  flight_time = gmtime ( &raw_time );
+
+	if (time_passed + flight_time->tm_min >= 60) {
+		hours = (time_passed + flight_time->tm_min)/60;
+		min = (time_passed + flight_time->tm_min)%60;
+	}else{
+		hours = 0;
+		min = (time_passed + flight_time->tm_min);
+	}
+	flight_time->tm_hour += GMT + hours;
+	flight_time->tm_min = min;
+
+	printf("%.2d:%.2d\n", flight_time->tm_hour, flight_time->tm_min);
+
+ }
+
+ void print_alert_crashing(Flight *airplane	) {
+	 printf("\n***************************************\n");
+	 printf("   ALERTA CRÍTICO, AERONAVE IRÁ CAIR   \n");
+	 printf("   Código do voo: %s\n", airplane->code);
+	 printf("***************************************\n");
+ }
+
+ void print_airport(Flight *first_flight, int n_flights, int n_landings, int n_take_offs){
+	 printf("|--------------------------------------------|\n");
+	 printf("|-----Aeroporto Internacional de Fegahel-----|\n");
+	 printf("|--------------------------------------------|\n");
+	 printf(" Hora Inicial: ");
+	 get_hour(0);
+	 printf(" Fila de Pedidos: ");
+	 print_flights(first_flight);
+	 printf("\n\n");
+	 printf(" Número de vôos: %d\n", n_flights);
+	 printf(" Número de aproximações: %d\n", n_landings);
+	 printf(" Número de decolagens: %d\n", n_take_offs);
+	 printf("|--------------------------------------------|\n\n");
+	 printf("Listagem de eventos: \n");
+
+ }
