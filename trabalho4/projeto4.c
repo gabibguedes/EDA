@@ -395,7 +395,7 @@ void get_hour(int time_passed){
 	time ( &raw_time );
   flight_time = gmtime ( &raw_time );
 
-	if (time_passed + flight_time->tm_min >= 60) {
+	if (time_passed >= 60) {
 		hours = time_passed/60;
 		min = time_passed%60;
 	}else{
