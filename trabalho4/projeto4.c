@@ -48,8 +48,8 @@ int main() {
 	srand(time(NULL));
 
 	//Estabelecendo número de voos de Aterrisagem e decolagem
-	arrivals = (rand() % 22) + 11;
-	take_off = (rand() % 22) + 11;
+	arrivals = (rand() % 23) + 10;
+	take_off = (rand() % 23) + 10;
 	number_of_flights = take_off + arrivals;
 
 	p_arrivals = (int*)(malloc(sizeof(int)));
