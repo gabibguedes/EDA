@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define FILE_NAME "contatos.txt"
+#define FILE_NAME "contatosiug.txt"
 
 typedef struct {
   char name[101];
