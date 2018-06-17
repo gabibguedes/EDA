@@ -21,5 +21,6 @@ void printPreOrder(Tree*);
 void printPosOrder(Tree*);
 void balanceTree(Tree*);
 int amount_of_elements(Tree*);
+void putTreeInMatrix(Tree*, int**);
 
 #endif

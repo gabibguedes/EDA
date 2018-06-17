@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "binary_tree.h"
+#define NO_CHILD 9999999
 
 Tree *loadTreeFromFile(char filename[100]){
   FILE *fp;
@@ -64,23 +65,79 @@ Tree *loadTreeFromFile(char filename[100]){
   return root;
 }
 
-   a
-  / \
-
 void showTree(Tree* root){
-
-}
-
-void printElements(Tree* root, Tree *branch){
-  for (int i = 0; i < getHeight(branch); i++) {
-    printf(" ");
+  // printf("%d ", root->value );
+  // if (root->smaller != NULL) {
+  //   showTree(root->smaller, root->height);
+  // }
+  // if (root->bigger != NULL) {
+  //   showTree(root->bigger, root->height);
+  // }
+  // printf("\n");
+  int spaces, spacesBetween, spaceAux;
+  int **treeMatrix = (int**)(calloc(100, sizeof(int*)));
+  for (int i = 0; i < 100; i++) {
+    treeMatrix[i] = (int*)(calloc(getHeight(root),sizeof(int)));
   }
-  printf("%d", branch->value);
+
+  putTreeInMatrix(root, treeMatrix);
+
+  spaces = 8 * getHeight(root);
+  spacesBetween = spaces;
+
+  for (int line = 0; line < getHeight(root); line++) {
+    for (int i = 0; i < spaces; i++) {
+      printf(" ");
+    }
+    spaceAux = spaces;
+    spaces = spaces/2 - 1;
+    for (int column = 1; column < treeMatrix[line][0] + 1; column++) {
+      if (treeMatrix[line][column] == NO_CHILD) {
+        printf("  ");
+      }else{
+        printf("%02d ", treeMatrix[line][column]);
+      }
+      for (int i = 0; i < spacesBetween; i++) {
+        printf(" ");
+      }
+    }
+    spacesBetween = spaceAux - 2;
+    printf("\n\n");
+  }
 
 }
 
-int biggerValue()
+void putTreeInMatrix(Tree* element, int**treeMatrix){
+  int line, column, nextLine, nextColumn, amount_of_NC;
+  line = element->height - 1;
+  column = treeMatrix[line][0] + 1;
 
+  treeMatrix[line][column] = element->value;
+  treeMatrix[line][0]++;
+
+  if (element->smaller != NULL) {
+    putTreeInMatrix(element->smaller, treeMatrix);
+  }else{
+    nextLine = line + 1;
+    for (int l = nextLine; l < getHeight(element); l++) {
+      //IMPLEMENTAR A ARVORE DE NOCHILDS
+    }
+    // nextColumn = treeMatrix[nextLine][0] + 1;
+    // treeMatrix[nextLine][nextColumn] = NO_CHILD;
+    // treeMatrix[nextLine][0]++;
+  }
+  if (element->bigger != NULL) {
+    putTreeInMatrix(element->bigger, treeMatrix);
+  }else{
+    nextLine = line + 1;
+    for (int l = nextLine; l < getHeight(element); l++) {
+      //IMPLEMENTAR A ARVORE DE NOCHILDS
+    }
+    // nextColumn = treeMatrix[nextLine][0] + 1;
+    // treeMatrix[nextLine][nextColumn] = NO_CHILD;
+    // treeMatrix[nextLine][0]++;
+  }
+}
 
 
   //     X   f: print x
@@ -190,12 +247,12 @@ void removeValue(Tree* root, int value){
         if(branch == daddy->bigger){
           daddy->bigger = NULL;
         }else{
-          daddy->smaller = NULL
+          daddy->smaller = NULL;
         }
-        free(branch)
+        free(branch);
 
     //Se for nó com 2 filhos
-    }else if(branch->smaller =!NULL && (branch->bigger !=NULL)){
+    }else if(branch->smaller != NULL && (branch->bigger !=NULL)){
       Tree *heir = branch->bigger, *heir_father = branch;
       int heir_not_found = 1;
       while(heir_not_found){
@@ -236,21 +293,9 @@ void removeValue(Tree* root, int value){
         if (branch->smaller !=NULL) {
           daddy->smaller = branch->smaller;
         }else{
-          daddy->smalleraseq = branch->bigger;
+          daddy->smaller = branch->bigger;
         }
       }
-    }
-
-  daddy -> heir
-  /  \
-     você
-     / \
- heir  nll
-  / \
- a  q
-
-
-
     }
 
     }else if (value > branch->value) {

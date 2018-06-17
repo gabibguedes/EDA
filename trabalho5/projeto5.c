@@ -3,11 +3,12 @@
 
 int main(){
   Tree * arvore;
-  arvore = loadTreeFromFile("BSTs/bst1.txt");
+  arvore = loadTreeFromFile("BSTs/bst2.txt");
 
-  int tamanho = getHeight(arvore);
-  printf("altura = %d\n", tamanho);
-  isFull(arvore);
-  searchValue(arvore,26);
+  // int tamanho = getHeight(arvore);
+  // printf("altura = %d\n", tamanho);
+  // isFull(arvore);
+  // searchValue(arvore,26);
+  showTree(arvore);
   return 0;
 }
