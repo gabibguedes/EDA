@@ -341,11 +341,23 @@ void printInOrder(Tree* root){
 }
 
 void printPreOrder(Tree* root){
-
+  printf("%d ", root->value);
+  if (root->smaller != NULL) {
+    printPreOrder(root->smaller);
+  }
+  if (root->bigger != NULL) {
+    printPreOrder(root->bigger);
+  }
 }
 
 void printPosOrder(Tree* root){
-
+  if (root->smaller != NULL) {
+    printPosOrder(root->smaller);
+  }
+  if (root->bigger != NULL) {
+    printPosOrder(root->bigger);
+  }
+  printf("%d ", root->value);
 }
 
 void balanceTree(Tree* root){
