@@ -9,6 +9,8 @@ int main(){
   // printf("altura = %d\n", tamanho);
   // isFull(arvore);
   // searchValue(arvore,26);
-  showTree(arvore);
+  // showTree(arvore);
+  printInOrder(arvore);
+  printf("\n");
   return 0;
 }

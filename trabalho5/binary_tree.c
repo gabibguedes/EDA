@@ -139,6 +139,16 @@ void putTreeInMatrix(Tree* element, int**treeMatrix){
   }
 }
 
+void printTree(Tree *root){
+  if (root->smaller != NULL) {
+    printTree(root->smaller);
+  }
+  if (root->bigger != NULL) {
+    printTree(root->bigger);
+  }
+  printf("%d ", root->value );
+}
+
 
   //     X   f: print x
   //   / \      print /\
@@ -321,7 +331,13 @@ void removeValue(Tree* root, int value){
 }
 
 void printInOrder(Tree* root){
-
+  if (root->smaller != NULL) {
+    printInOrder(root->smaller);
+  }
+  printf("%d ", root->value);
+  if (root->bigger != NULL) {
+    printInOrder(root->bigger);
+  }
 }
 
 void printPreOrder(Tree* root){
