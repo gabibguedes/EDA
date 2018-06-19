@@ -188,7 +188,7 @@ void loadNewTree(){
   int file;
   system("clear");
   printf("--------------------------------------------------------------------------------\n");
-  printf("-%*s Nova Árvore: %*s-\n",33," ",32," " );
+  printf("-%*s Nova Árvore: %*s-\n",32," ",32," " );
   printf("--------------------------------------------------------------------------------\n");
   printf("Escolha um arquivo para carregar sua árvore\n");
   printf("1 -bst1.txt\n");
