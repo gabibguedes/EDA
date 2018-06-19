@@ -23,4 +23,15 @@ void balanceTree(Tree*);
 int amount_of_elements(Tree*);
 void putTreeInMatrix(Tree*, int**);
 
+void fillLevel(Tree *nodes[],Tree *node,int targetLevel,int level,int nr);
+void printNode(int , int);
+void printCentered(int,char*);
+void printSlahes(int , int , Tree *const *nodes);
+void printNodesForLevel(Tree *,int, int);
+
+int isBalanced(Tree *);
+Tree* rotationRight(Tree *, Tree *, Tree *);
+Tree* rotationLeft(Tree *, Tree *, Tree *, Tree*);
+Tree* setBackbone(Tree *);
+
 #endif
