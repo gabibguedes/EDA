@@ -46,6 +46,19 @@ int minimum(int x, int y) {
   }
 }
 
+int getLevel(Tree *root, int value){
+  if (root == NULL) {
+    return 0;
+  }
+  if (value > root->value) {
+    return 1 + getLevel(root->bigger, value);
+  }else if(value < root->value){
+    return 1 + getLevel(root->smaller, value);
+  }else{
+    return 1;
+  }
+}
+
 Tree *loadTreeFromFile(char filename[100]){
   FILE *fp;
   Tree* root = (Tree*)(malloc(sizeof(Tree)));
@@ -385,14 +398,14 @@ void searchValue(Tree* root, int value){
     if(value == branch->value){
       not_found = 0;
       printf("Elemento %d encontrado\n", value);
-      printf("\tNível do nó: %d\n", branch->height);
+      printf("\tNível do nó: %d\n", getLevel(root, value));
       if (daddy == NULL) {
         printf("\tO elemento é a raiz\n");
       }else{
         printf("\tPai: %d\n", daddy->value);
-      }
-      if(daddy->smaller != NULL && (daddy->bigger != NULL)){
-        printf("\tIrmão: %d\n", brother->value);
+        if(daddy->smaller != NULL && (daddy->bigger != NULL)){
+          printf("\tIrmão: %d\n", brother->value);
+        }
       }
 
     }else if (value > branch->value) {

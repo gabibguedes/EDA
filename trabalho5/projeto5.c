@@ -49,7 +49,6 @@ void menu(Tree *root){
       showTree(root);
       wait_user_response();
       menu(root);
-
      	break;
 
     case 2:
@@ -148,34 +147,33 @@ void menu(Tree *root){
       break;
 
     case 9:
-    system("clear");
-    printf("--------------------------------------------------------------------------------\n");
-    printf("-%*s Balancear: %*s-\n",31," ",31," " );
-    printf("--------------------------------------------------------------------------------\n");
-
-    printf("\nÁrvore antiga:\n" );
-    showTree(root);
-    printf("\n\n\nÁrvore balanceada:\n\n" );
-    root = balanceTree(root);
-    showTree(root);
-    wait_user_response();
-    menu(root);
-    break;
+      system("clear");
+      printf("--------------------------------------------------------------------------------\n");
+      printf("-%*s Balancear: %*s-\n",31," ",31," " );
+      printf("--------------------------------------------------------------------------------\n");
+      printf("\nÁrvore antiga:\n" );
+      showTree(root);
+      printf("\n\n\nÁrvore balanceada:\n\n" );
+      root = balanceTree(root);
+      showTree(root);
+      wait_user_response();
+      menu(root);
+      break;
 
     case 10:
-    loadNewTree();
-    break;
+      loadNewTree();
+      break;
 
     case 11:
-    exit(-1);
-    break;
+      exit(-1);
+      break;
 
     default :
-    printf ("Por favor, insira uma opcao valida!\n");
-    getchar();
-    sleep(2);
-    menu(root);
-    break;
+      printf ("Por favor, insira uma opção valida!\n");
+      getchar();
+      sleep(2);
+      menu(root);
+      break;
     }
 }
 

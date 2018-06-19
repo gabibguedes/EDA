@@ -10,7 +10,7 @@ typedef struct tree {
 
 
 Tree *loadTreeFromFile(char[100]);
-
+int getLevel(Tree*, int);
 void showTree(Tree*);
 void isFull(Tree*);
 void searchValue(Tree*, int);
