@@ -15,7 +15,7 @@ void showTree(Tree*);
 void isFull(Tree*);
 void searchValue(Tree*, int);
 int getHeight(Tree*);
-void removeValue(Tree*, int);
+Tree * removeValue(Tree*, int);
 void printInOrder(Tree*);
 void printPreOrder(Tree*);
 void printPosOrder(Tree*);

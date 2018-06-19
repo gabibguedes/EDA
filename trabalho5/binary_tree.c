@@ -528,112 +528,93 @@ int getHeight(Tree* root){
   }else{
     return 1 + maximum(getHeight(root->bigger), getHeight(root->smaller));
   }
+}
 
-//   if(root == NULL) {
-//     return 0;
-//   //folha :
-// } else if(root->smaller == NULL &&(root->bigger == NULL)){
-//     return root->height;
+// void removeValue(Tree* root, int value){
+//   Tree *branch = root;
+//   Tree *daddy = NULL, *brother = NULL;
+//   int not_found = 1;
 //
-//   //nó:
-//   }else{
-//     int height_s, height_b;
-//     height_s = getHeight(root->smaller);
-//     height_b = getHeight(root->bigger);
+//   while(not_found){
+//     //Se for folha
+//     if(value == branch->value){
+//       not_found = 0;
+//       if(branch->bigger == NULL &&(branch->smaller == NULL)){
+//         if(branch == daddy->bigger){
+//           daddy->bigger = NULL;
+//         }else{
+//           daddy->smaller = NULL;
+//         }
+//         free(branch);
 //
-//     if (height_b > height_s) {
-//       return height_b;
+//     //Se for nó com 2 filhos
+//     }else if(branch->smaller != NULL && (branch->bigger !=NULL)){
+//       Tree *heir = branch->bigger, *heir_father = branch;
+//       int heir_not_found = 1;
+//       while(heir_not_found){
+//         if(heir->smaller == NULL){
+//           heir_not_found = 0;
+//
+//           //Pai recebe herdeiro
+//           if (daddy->smaller == branch) {
+//             daddy->smaller = heir;
+//           }else{
+//             daddy->bigger = heir;
+//           }
+//
+//           //se herdeiro tiver 1 filho (bigger)
+//           if (heir->bigger != NULL) {
+//             if (heir_father->smaller == heir) {
+//               heir_father->smaller = heir->bigger;
+//             }else{
+//               heir_father->bigger = heir->bigger;
+//             }
+//           }
+//           free(branch);
+//         }else{
+//           heir_father = heir;
+//           heir = heir->smaller;
+//         }
+//       }
+//
+//     //Se for nó e tiver 1 filho
+//     }else if (daddy != NULL){
+//       if (branch->value > daddy->value) {
+//         if (branch->smaller !=NULL) {
+//           daddy->bigger = branch->smaller;
+//         }else{
+//           daddy->bigger = branch->bigger;
+//         }
+//       }else{
+//         if (branch->smaller !=NULL) {
+//           daddy->smaller = branch->smaller;
+//         }else{
+//           daddy->smaller = branch->bigger;
+//         }
+//       }
+//     }
+//
+//     }else if (value > branch->value) {
+//       if (branch->bigger == NULL) {
+//         printf("Valor não pertence a árvore\n");
+//         not_found = 0;
+//       }else{
+//         daddy = branch;
+//         brother = branch->smaller;
+//         branch = branch->bigger;
+//       }
 //     }else{
-//       return height_s;
+//       if(branch->smaller == NULL){
+//         printf("Valor não pertence a árvore\n");
+//         not_found = 0;
+//       }else{
+//         daddy = branch;
+//         brother = branch->bigger;
+//         branch = branch->smaller;
+//       }
 //     }
 //   }
-}
-
-void removeValue(Tree* root, int value){
-  Tree *branch = root;
-  Tree *daddy = NULL, *brother = NULL;
-  int not_found = 1;
-
-  while(not_found){
-    //Se for folha
-    if(value == branch->value){
-      not_found = 0;
-      if(branch->bigger == NULL &&(branch->smaller == NULL)){
-        if(branch == daddy->bigger){
-          daddy->bigger = NULL;
-        }else{
-          daddy->smaller = NULL;
-        }
-        free(branch);
-
-    //Se for nó com 2 filhos
-    }else if(branch->smaller != NULL && (branch->bigger !=NULL)){
-      Tree *heir = branch->bigger, *heir_father = branch;
-      int heir_not_found = 1;
-      while(heir_not_found){
-        if(heir->smaller == NULL){
-          heir_not_found = 0;
-
-          //Pai recebe herdeiro
-          if (daddy->smaller == branch) {
-            daddy->smaller = heir;
-          }else{
-            daddy->bigger = heir;
-          }
-
-          //se herdeiro tiver 1 filho (bigger)
-          if (heir->bigger != NULL) {
-            if (heir_father->smaller == heir) {
-              heir_father->smaller = heir->bigger;
-            }else{
-              heir_father->bigger = heir->bigger;
-            }
-          }
-          free(branch);
-        }else{
-          heir_father = heir;
-          heir = heir->smaller;
-        }
-      }
-
-    //Se for nó e tiver 1 filho
-    }else if (daddy != NULL){
-      if (branch->value > daddy->value) {
-        if (branch->smaller !=NULL) {
-          daddy->bigger = branch->smaller;
-        }else{
-          daddy->bigger = branch->bigger;
-        }
-      }else{
-        if (branch->smaller !=NULL) {
-          daddy->smaller = branch->smaller;
-        }else{
-          daddy->smaller = branch->bigger;
-        }
-      }
-    }
-
-    }else if (value > branch->value) {
-      if (branch->bigger == NULL) {
-        printf("Valor não pertence a árvore\n");
-        not_found = 0;
-      }else{
-        daddy = branch;
-        brother = branch->smaller;
-        branch = branch->bigger;
-      }
-    }else{
-      if(branch->smaller == NULL){
-        printf("Valor não pertence a árvore\n");
-        not_found = 0;
-      }else{
-        daddy = branch;
-        brother = branch->bigger;
-        branch = branch->smaller;
-      }
-    }
-  }
-}
+// }
 
 void printInOrder(Tree* root){
   if (root->smaller != NULL) {
@@ -675,7 +656,9 @@ void balanceTree(Tree* root){
     while (!isBalanced(root)) {
       grandpa = root;
       daddy = root;
-      kid = daddy->bigger;
+      if (daddy !=NULL) {
+        kid = daddy->bigger;
+      }
       if (kid != NULL) {
         root = rotationLeft(NULL, daddy, kid, root);
       }
@@ -684,10 +667,12 @@ void balanceTree(Tree* root){
       daddy = kid;
       kid = daddy->bigger;
 
-      while ((daddy->bigger != NULL) && !isBalanced(root)) {
+      while ((daddy != NULL) && !isBalanced(root)) {
         grandpa = daddy;
         daddy = kid;
-        kid = daddy->bigger;
+        if (daddy !=NULL) {
+          kid = daddy->bigger;
+        }
 
         if (kid != NULL) {
           root = rotationLeft(grandpa, daddy, kid, root);
@@ -695,7 +680,9 @@ void balanceTree(Tree* root){
 
         grandpa = daddy;
         daddy = kid;
-        kid = daddy->bigger;
+        if (daddy != NULL) {
+          kid = daddy->bigger;
+        }
       }
     }
   }
@@ -784,4 +771,37 @@ int isBalanced(Tree *root){
       //Arvore não balanceada
       return 0;
     }
+}
+
+
+
+
+
+Tree *removeValue(Tree* root, int number){
+  if(root == NULL){
+		printf("Valor %d nao encontrado na arvore!", number);
+    return root;
+  }
+  if(number < root->value){
+    root->smaller = removeValue(root->smaller,number);
+  }else if(number > root->value){
+    root->bigger = removeValue(root->bigger,number);
+  }else{
+    if(root->smaller == NULL){
+      Tree *temp = root->smaller;
+      free(root);
+			printf("Valor removido com sucesso!\n");
+      return temp;
+    }else if(root->bigger == NULL){
+      Tree *temp = root->bigger;
+			printf("Valor removido com sucesso!\n");
+      free(root);
+      return temp;
+    }
+    Tree *temp = find_min(root->bigger);
+    root->value = temp->value;
+    root->bigger = removeValue(root->bigger,temp->value);
+
+  }
+  return root;
 }
