@@ -19,7 +19,7 @@ Tree * removeValue(Tree*, int);
 void printInOrder(Tree*);
 void printPreOrder(Tree*);
 void printPosOrder(Tree*);
-void balanceTree(Tree*);
+Tree *balanceTree(Tree*);
 int amount_of_elements(Tree*);
 void putTreeInMatrix(Tree*, int**);
 

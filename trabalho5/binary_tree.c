@@ -349,115 +349,10 @@ void showTree(Tree *t) {
         printf("\n");
     }
     if (proot->height >= MAX_HEIGHT) {
-        printf("(This tree is taller than %d, and may be drawn incorrectly.)\n", MAX_HEIGHT);
+        printf("(A árvore é maior que %d, ela pode ser desenhada incorretamente)\n", MAX_HEIGHT);
     }
     free_ascii_tree(proot);
 }
-// ///////////////////////////////////////////////////////////////////////////////////////
-// void showTree(Tree *root){
-  // for (int i = 0; i < getHeight(root); i++) {
-  //   printNodesForLevel(root, i, getHeight(root) - 1);
-  // }
-// }
-//
-// int getLevelUtil(Tree *root, int number, int level){
-//     if (root == NULL){
-//       return 0;
-//     }
-//
-//     if (root->value == number){
-//       return level;
-//     }
-//
-//     int downlevel = getLevelUtil(root->smaller, number, level+1);
-//     if (downlevel != 0)
-//         return downlevel;
-//
-//     downlevel = getLevelUtil(root->bigger, number, level+1);
-//     return downlevel;
-// }
-//
-// int getLevel(Tree *root, int number){
-//     return getLevelUtil(root,number,1);
-// }
-//
-// void printNodesForLevel(Tree *root, int level, int height) {
-//     int maxLengthPerEntry = 4;
-//     int width = (int) pow(2, height) * maxLengthPerEntry;
-//     int numElements = (int) pow(2, level);
-//
-//     int widthForEachElement;
-//     if (getHeight(root) <= 5) {
-//       widthForEachElement = width / numElements;
-//     }else if (getHeight(root) <= 7){
-//       widthForEachElement = width / (2 *numElements);
-//     }else {
-//       widthForEachElement = width / (15.2 * numElements);
-//     }
-//
-//     Tree **nodes = (Tree **) calloc(numElements, sizeof(Tree *));
-//     fillLevel(nodes, root, level, 0, 0);
-//
-//     if (level > 0) {
-//         printSlahes(numElements, widthForEachElement, nodes);
-//     }
-//
-//     for (int i = 0; i < numElements; i++) {
-//         if (nodes[i] != NULL) {
-//             printNode(widthForEachElement, nodes[i]->value);
-//         } else {
-//             printf("%*s", widthForEachElement, "");
-//         }
-//     }
-//     free(nodes);
-//     printf("\n");
-// }
-//
-// void fillLevel(Tree *nodes[], Tree *node, int targetLevel, int level, int nr) {
-//     if (level == targetLevel) {
-//         nodes[nr] = node;
-//         return;
-//     }
-//
-//     if (node->smaller != NULL) {
-//         fillLevel(nodes, node->smaller, targetLevel, level + 1, nr * 2);
-//     }
-//     if (node->bigger != NULL) {
-//         fillLevel(nodes, node->bigger, targetLevel, level + 1, nr * 2 + 1);
-//     }
-// }
-//
-// void printNode(int widthForEachElement, int data) {
-//     char buf[20];
-//     sprintf(buf, "%02d", data);
-//     printCentered(widthForEachElement, buf);
-// }
-//
-// //omit slahes if there is no data in that subtree
-// void printSlahes(int numElements, int widthForEachElement, Tree *const *nodes) {
-//     for (int i = 0; i < numElements; i += 2) {
-//         if (nodes[i] != NULL) {
-//             printf("%*s", widthForEachElement / 2, "");
-//             printCentered(widthForEachElement / 2, "/");
-//         } else {
-//             printf("%*s", widthForEachElement, "");
-//         }
-//         if (nodes[i + 1] != NULL) {
-//             printCentered(widthForEachElement / 2, "\\");
-//             printf("%*s", widthForEachElement / 2, "");
-//         } else {
-//             printf("%*s", widthForEachElement, "");
-//         }
-//     }
-//     printf("\n");
-// }
-//
-// void printCentered(int width, char *str) {
-//     int emptySpace = (int) (width - strlen(str)) / 2;
-//     printf("%*s%s%*s", emptySpace, "", str, width - (int) strlen(str) - emptySpace, "");
-// }
-//
-// //////////////////////////////////////////////////////////////////////////////////////////
 
 void isFull(Tree* root){
   int number_of_elements, height;
@@ -502,7 +397,7 @@ void searchValue(Tree* root, int value){
 
     }else if (value > branch->value) {
       if (branch->bigger == NULL) {
-        printf("Valor não pertence a árvore\n");
+        printf("O valor %d não pertence a árvore!\n", value);
         not_found = 0;
       }else{
         daddy = branch;
@@ -511,7 +406,7 @@ void searchValue(Tree* root, int value){
       }
     }else{
       if(branch->smaller == NULL){
-        printf("Valor não pertence a árvore\n");
+        printf("O valor %d não pertence a árvore!\n", value);
         not_found = 0;
       }else{
         daddy = branch;
@@ -529,92 +424,6 @@ int getHeight(Tree* root){
     return 1 + maximum(getHeight(root->bigger), getHeight(root->smaller));
   }
 }
-
-// void removeValue(Tree* root, int value){
-//   Tree *branch = root;
-//   Tree *daddy = NULL, *brother = NULL;
-//   int not_found = 1;
-//
-//   while(not_found){
-//     //Se for folha
-//     if(value == branch->value){
-//       not_found = 0;
-//       if(branch->bigger == NULL &&(branch->smaller == NULL)){
-//         if(branch == daddy->bigger){
-//           daddy->bigger = NULL;
-//         }else{
-//           daddy->smaller = NULL;
-//         }
-//         free(branch);
-//
-//     //Se for nó com 2 filhos
-//     }else if(branch->smaller != NULL && (branch->bigger !=NULL)){
-//       Tree *heir = branch->bigger, *heir_father = branch;
-//       int heir_not_found = 1;
-//       while(heir_not_found){
-//         if(heir->smaller == NULL){
-//           heir_not_found = 0;
-//
-//           //Pai recebe herdeiro
-//           if (daddy->smaller == branch) {
-//             daddy->smaller = heir;
-//           }else{
-//             daddy->bigger = heir;
-//           }
-//
-//           //se herdeiro tiver 1 filho (bigger)
-//           if (heir->bigger != NULL) {
-//             if (heir_father->smaller == heir) {
-//               heir_father->smaller = heir->bigger;
-//             }else{
-//               heir_father->bigger = heir->bigger;
-//             }
-//           }
-//           free(branch);
-//         }else{
-//           heir_father = heir;
-//           heir = heir->smaller;
-//         }
-//       }
-//
-//     //Se for nó e tiver 1 filho
-//     }else if (daddy != NULL){
-//       if (branch->value > daddy->value) {
-//         if (branch->smaller !=NULL) {
-//           daddy->bigger = branch->smaller;
-//         }else{
-//           daddy->bigger = branch->bigger;
-//         }
-//       }else{
-//         if (branch->smaller !=NULL) {
-//           daddy->smaller = branch->smaller;
-//         }else{
-//           daddy->smaller = branch->bigger;
-//         }
-//       }
-//     }
-//
-//     }else if (value > branch->value) {
-//       if (branch->bigger == NULL) {
-//         printf("Valor não pertence a árvore\n");
-//         not_found = 0;
-//       }else{
-//         daddy = branch;
-//         brother = branch->smaller;
-//         branch = branch->bigger;
-//       }
-//     }else{
-//       if(branch->smaller == NULL){
-//         printf("Valor não pertence a árvore\n");
-//         not_found = 0;
-//       }else{
-//         daddy = branch;
-//         brother = branch->bigger;
-//         branch = branch->smaller;
-//       }
-//     }
-//   }
-// }
 
 void printInOrder(Tree* root){
   if (root->smaller != NULL) {
@@ -646,7 +455,7 @@ void printPosOrder(Tree* root){
   printf("%d ", root->value);
 }
 
-void balanceTree(Tree* root){
+Tree *balanceTree(Tree* root){
   Tree *daddy, *grandpa, *kid;
   if (isBalanced(root)) {
     printf("A árvore já está balanceada\n");
@@ -686,6 +495,7 @@ void balanceTree(Tree* root){
       }
     }
   }
+  return root;
   showTree(root);
 }
 
@@ -773,10 +583,6 @@ int isBalanced(Tree *root){
     }
 }
 
-
-
-
-
 Tree *removeValue(Tree* root, int number){
   if(root == NULL){
 		printf("Valor %d nao encontrado na arvore!", number);
@@ -788,12 +594,12 @@ Tree *removeValue(Tree* root, int number){
     root->bigger = removeValue(root->bigger,number);
   }else{
     if(root->smaller == NULL){
-      Tree *temp = root->smaller;
+      Tree *temp = root->bigger;
       free(root);
 			printf("Valor removido com sucesso!\n");
       return temp;
     }else if(root->bigger == NULL){
-      Tree *temp = root->bigger;
+      Tree *temp = root->smaller;
 			printf("Valor removido com sucesso!\n");
       free(root);
       return temp;
