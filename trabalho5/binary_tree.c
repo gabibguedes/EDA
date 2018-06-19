@@ -5,6 +5,31 @@
 #include "binary_tree.h"
 #define NO_CHILD 9999999
 
+#define MAX_HEIGHT 1000
+int lprofile[MAX_HEIGHT];
+int rprofile[MAX_HEIGHT];
+#define INFINITY (1<<20)
+
+typedef struct BSTNode_struct BSTNode;
+
+struct BSTNode_struct {
+    BSTNode *ptLeft, *ptRight;
+
+    //length of the edge from this node to its children
+    int edge_length;
+
+    int height;
+
+    int element;
+
+    //-1=I am left, 0=I am root, 1=right
+    int parent_dir;
+
+    //max supported unit32 in dec, 10 digits max
+    char label[11];
+};
+
+
 int maximum(int x, int y) {
   if(x > y){
     return x;
@@ -70,213 +95,369 @@ Tree *loadTreeFromFile(char filename[100]){
   }
   return root;
 }
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 
-void showTree(Tree *root){
-  for (int i = 0; i < getHeight(root); i++) {
-    printNodesForLevel(root, i, getHeight(root) - 1);
-  }
+Tree *find_min(Tree *t) {
+    if (t == NULL) {
+        return NULL;
+    }
+    else if (t->smaller == NULL) {
+        return t;
+    }
+    else {
+        return find_min(t->smaller);
+    }
 }
 
-int getLevelUtil(Tree *root, int number, int level){
-    if (root == NULL){
-      return 0;
+Tree *find_max(Tree *t) {
+    if (t == NULL) {
+        return NULL;
+    }
+    else if (t->bigger == NULL) {
+        return t;
+    }
+    else {
+        return find_max(t->bigger);
+    }
+}
+
+Tree *find(int elem, Tree *t) {
+    if (t == NULL) {
+        return NULL;
     }
 
-    if (root->value == number){
-      return level;
+    if (elem < t->value) {
+        return find(elem, t->smaller);
+    }
+    else if (elem > t->value) {
+        return find(elem, t->bigger);
+    }
+    else {
+        return t;
+    }
+}
+
+//Insert i into the tree t, duplicate will be discarded
+//Return a pointer to the resulting tree.
+
+//adjust gap between left and right nodes
+int gap = 3;
+
+//used for printing next node in the same level,
+//this is the x coordinate of the next char printed
+int print_next;
+
+BSTNode *build_ascii_tree_recursive(Tree *t) {
+    BSTNode *node;
+
+    if (t == NULL) return NULL;
+
+    node = malloc(sizeof(BSTNode));
+    node->ptLeft = build_ascii_tree_recursive(t->smaller);
+    node->ptRight = build_ascii_tree_recursive(t->bigger);
+
+    if (node->ptLeft != NULL) {
+        node->ptLeft->parent_dir = -1;
     }
 
-    int downlevel = getLevelUtil(root->smaller, number, level+1);
-    if (downlevel != 0)
-        return downlevel;
+    if (node->ptRight != NULL) {
+        node->ptRight->parent_dir = 1;
+    }
 
-    downlevel = getLevelUtil(root->bigger, number, level+1);
-    return downlevel;
+    sprintf(node->label, "%d", t->value);
+    node->element = strlen(node->label);
+
+    return node;
 }
 
-int getLevel(Tree *root, int number){
-    return getLevelUtil(root,number,1);
+
+//Copy the tree into the ascii node structre
+BSTNode *build_ascii_tree(Tree *t) {
+    BSTNode *node;
+    if (t == NULL){
+      return NULL;
+    }
+    node = build_ascii_tree_recursive(t);
+    node->parent_dir = 0;
+    return node;
 }
 
-void printNodesForLevel(Tree *root, int level, int height) {
-    int maxLengthPerEntry = 4;
-    int width = (int) pow(2, height) * maxLengthPerEntry;
-    int numElements = (int) pow(2, level);
+//Free all the nodes of the given tree
+void free_ascii_tree(BSTNode *node) {
+    if (node == NULL) return;
+    free_ascii_tree(node->ptLeft);
+    free_ascii_tree(node->ptRight);
+    free(node);
+}
 
-    int widthForEachElement;
-    if (getHeight(root) <= 5) {
-      widthForEachElement = width / numElements;
-    }else if (getHeight(root) <= 7){
-      widthForEachElement = width / (2 *numElements);
+//The following function fills in the lprofile array for the given tree.
+//It assumes that the center of the label of the root of this tree
+//is located at a position (x,y).  It assumes that the edge_length
+//fields have been computed for this tree.
+void compute_lprofile(BSTNode *node, int x, int y) {
+    int i, isleft;
+    if (node == NULL) return;
+    isleft = (node->parent_dir == -1);
+    lprofile[y] = minimum(lprofile[y], x - ((node->element - isleft) / 2));
+    if (node->ptLeft != NULL) {
+        for (i = 1; i <= node->edge_length && y + i < MAX_HEIGHT; i++) {
+            lprofile[y + i] = minimum(lprofile[y + i], x - i);
+        }
+    }
+    compute_lprofile(node->ptLeft, x - node->edge_length - 1, y + node->edge_length + 1);
+    compute_lprofile(node->ptRight, x + node->edge_length + 1, y + node->edge_length + 1);
+}
+
+void compute_rprofile(BSTNode *node, int x, int y) {
+    int i, notleft;
+    if (node == NULL){
+      return;
+    }
+    notleft = (node->parent_dir != -1);
+    rprofile[y] = maximum(rprofile[y], x + ((node->element - notleft) / 2));
+    if (node->ptRight != NULL) {
+        for (i = 1; i <= node->edge_length && y + i < MAX_HEIGHT; i++) {
+            rprofile[y + i] = maximum(rprofile[y + i], x + i);
+        }
+    }
+    compute_rprofile(node->ptLeft, x - node->edge_length - 1, y + node->edge_length + 1);
+    compute_rprofile(node->ptRight, x + node->edge_length + 1, y + node->edge_length + 1);
+}
+
+//This function fills in the edge_length and
+//height fields of the specified tree
+void filledge(BSTNode *node) {
+    int h, hmin, i, delta;
+    if (node == NULL){
+      return;
+    }
+    filledge(node->ptLeft);
+    filledge(node->ptRight);
+
+    /* first fill in the edge_length of node */
+    if (node->ptRight == NULL && node->ptLeft == NULL) {
+        node->edge_length = 0;
     }else {
-      widthForEachElement = width / (15.2 * numElements);
+        if (node->ptLeft != NULL) {
+            for (i = 0; i < node->ptLeft->height && i < MAX_HEIGHT; i++) {
+                rprofile[i] = -INFINITY;
+            }
+            compute_rprofile(node->ptLeft, 0, 0);
+            hmin = node->ptLeft->height;
+        }else {
+            hmin = 0;
+        }
+        if (node->ptRight != NULL) {
+            for (i = 0; i < node->ptRight->height && i < MAX_HEIGHT; i++) {
+                lprofile[i] = INFINITY;
+            }
+            compute_lprofile(node->ptRight, 0, 0);
+            hmin = minimum(node->ptRight->height, hmin);
+        }
+        else {
+            hmin = 0;
+        }
+        delta = 4;
+        for (i = 0; i < hmin; i++) {
+            delta = maximum(delta, gap + 1 + rprofile[i] - lprofile[i]);
+        }
+
+        //If the node has two children of height 1, then we allow the
+        //two leaves to be within 1, instead of 2
+        if (((node->ptLeft != NULL && node->ptLeft->height == 1) ||
+             (node->ptRight != NULL && node->ptRight->height == 1)) && delta > 4) {
+            delta--;
+        }
+
+        node->edge_length = ((delta + 1) / 2) - 1;
     }
 
-    Tree **nodes = (Tree **) calloc(numElements, sizeof(Tree *));
-    fillLevel(nodes, root, level, 0, 0);
-
-    if (level > 0) {
-        printSlahes(numElements, widthForEachElement, nodes);
+    //now fill in the height of node
+    h = 1;
+    if (node->ptLeft != NULL) {
+        h = maximum(node->ptLeft->height + node->edge_length + 1, h);
     }
+    if (node->ptRight != NULL) {
+        h = maximum(node->ptRight->height + node->edge_length + 1, h);
+    }
+    node->height = h;
+}
 
-    for (int i = 0; i < numElements; i++) {
-        if (nodes[i] != NULL) {
-            printNode(widthForEachElement, nodes[i]->value);
-        } else {
-            printf("%*s", widthForEachElement, "");
+//This function prints the given level of the given tree, assuming
+//that the node has the given x cordinate.
+void printLevel(BSTNode *node, int x, int level) {
+    int i, isleft;
+    if (node == NULL) return;
+    isleft = (node->parent_dir == -1);
+    if (level == 0) {
+        for (i = 0; i < (x - print_next - ((node->element - isleft) / 2)); i++) {
+            printf(" ");
+        }
+        print_next += i;
+        printf("%s", node->label);
+        print_next += node->element;
+    }
+    else if (node->edge_length >= level) {
+        if (node->ptLeft != NULL) {
+            for (i = 0; i < (x - print_next - (level)); i++) {
+                printf(" ");
+            }
+            print_next += i;
+            printf("/");
+            print_next++;
+        }
+        if (node->ptRight != NULL) {
+            for (i = 0; i < (x - print_next + (level)); i++) {
+                printf(" ");
+            }
+            print_next += i;
+            printf("\\");
+            print_next++;
         }
     }
-    free(nodes);
-    printf("\n");
-}
-
-void fillLevel(Tree *nodes[], Tree *node, int targetLevel, int level, int nr) {
-    if (level == targetLevel) {
-        nodes[nr] = node;
-        return;
-    }
-
-    if (node->smaller != NULL) {
-        fillLevel(nodes, node->smaller, targetLevel, level + 1, nr * 2);
-    }
-    if (node->bigger != NULL) {
-        fillLevel(nodes, node->bigger, targetLevel, level + 1, nr * 2 + 1);
+    else {
+        printLevel(node->ptLeft,
+                   x - node->edge_length - 1,
+                   level - node->edge_length - 1);
+        printLevel(node->ptRight,
+                   x + node->edge_length + 1,
+                   level - node->edge_length - 1);
     }
 }
 
-void printNode(int widthForEachElement, int data) {
-    char buf[20];
-    sprintf(buf, "%02d", data);
-    printCentered(widthForEachElement, buf);
-}
-
-//omit slahes if there is no data in that subtree
-void printSlahes(int numElements, int widthForEachElement, Tree *const *nodes) {
-    for (int i = 0; i < numElements; i += 2) {
-        if (nodes[i] != NULL) {
-            printf("%*s", widthForEachElement / 2, "");
-            printCentered(widthForEachElement / 2, "/");
-        } else {
-            printf("%*s", widthForEachElement, "");
-        }
-        if (nodes[i + 1] != NULL) {
-            printCentered(widthForEachElement / 2, "\\");
-            printf("%*s", widthForEachElement / 2, "");
-        } else {
-            printf("%*s", widthForEachElement, "");
-        }
+//prints ascii tree for given Tree structure
+void showTree(Tree *t) {
+    BSTNode *proot;
+    int xmin, i;
+    if (t == NULL){
+      return;
     }
-    printf("\n");
-}
-
-int maxDepth(Tree *node) {
-    if (node == NULL) {
-        return -1;
-    } else {
-        return maximum(maxDepth(node->smaller), maxDepth(node->bigger)) + 1;
+    proot = build_ascii_tree(t);
+    filledge(proot);
+    for (i = 0; i < proot->height && i < MAX_HEIGHT; i++) {
+        lprofile[i] = INFINITY;
     }
+    compute_lprofile(proot, 0, 0);
+    xmin = 0;
+    for (i = 0; i < proot->height && i < MAX_HEIGHT; i++) {
+        xmin = minimum(xmin, lprofile[i]);
+    }
+    for (i = 0; i < proot->height; i++) {
+        print_next = 0;
+        printLevel(proot, -xmin, i);
+        printf("\n");
+    }
+    if (proot->height >= MAX_HEIGHT) {
+        printf("(This tree is taller than %d, and may be drawn incorrectly.)\n", MAX_HEIGHT);
+    }
+    free_ascii_tree(proot);
 }
-
-void printCentered(int width, char *str) {
-    int emptySpace = (int) (width - strlen(str)) / 2;
-    printf("%*s%s%*s", emptySpace, "", str, width - (int) strlen(str) - emptySpace, "");
-}
-
-// void showTree(Tree* root){
-//   int spaces, spacesBetween, spaceAux;
-//   int **treeMatrix = (int**)(calloc(100, sizeof(int*)));
-//   for (int i = 0; i < 100; i++) {
-//     treeMatrix[i] = (int*)(calloc(getHeight(root),sizeof(int)));
-//   }
+// ///////////////////////////////////////////////////////////////////////////////////////
+// void showTree(Tree *root){
+  // for (int i = 0; i < getHeight(root); i++) {
+  //   printNodesForLevel(root, i, getHeight(root) - 1);
+  // }
+// }
 //
-//   putTreeInMatrix(root, treeMatrix);
-//
-//   spaces = 8 * getHeight(root);
-//   spacesBetween = spaces;
-//
-//   for (int line = 0; line < getHeight(root); line++) {
-//     for (int i = 0; i < spaces; i++) {
-//       printf(" ");
+// int getLevelUtil(Tree *root, int number, int level){
+//     if (root == NULL){
+//       return 0;
 //     }
-//     spaceAux = spaces;
-//     spaces = spaces/2 - 1;
-//     for (int column = 1; column < treeMatrix[line][0] + 1; column++) {
-//       if (treeMatrix[line][column] == NO_CHILD) {
-//         printf("  ");
-//       }else{
-//         printf("%02d ", treeMatrix[line][column]);
-//       }
-//       for (int i = 0; i < spacesBetween; i++) {
-//         printf(" ");
-//       }
+//
+//     if (root->value == number){
+//       return level;
 //     }
-//     spacesBetween = spaceAux - 2;
-//     printf("\n\n");
 //
-//   }
+//     int downlevel = getLevelUtil(root->smaller, number, level+1);
+//     if (downlevel != 0)
+//         return downlevel;
 //
-//   for (int i = 0; i < getHeight(root); i++) {
-//     for (int j = 0; j < 8; j++) {
-//       if (treeMatrix[i][j] == NO_CHILD) {
-//         printf("nc ");
-//       }else{
-//         printf("%02d ",treeMatrix[i][j]);
+//     downlevel = getLevelUtil(root->bigger, number, level+1);
+//     return downlevel;
+// }
 //
-//       }
+// int getLevel(Tree *root, int number){
+//     return getLevelUtil(root,number,1);
+// }
+//
+// void printNodesForLevel(Tree *root, int level, int height) {
+//     int maxLengthPerEntry = 4;
+//     int width = (int) pow(2, height) * maxLengthPerEntry;
+//     int numElements = (int) pow(2, level);
+//
+//     int widthForEachElement;
+//     if (getHeight(root) <= 5) {
+//       widthForEachElement = width / numElements;
+//     }else if (getHeight(root) <= 7){
+//       widthForEachElement = width / (2 *numElements);
+//     }else {
+//       widthForEachElement = width / (15.2 * numElements);
+//     }
+//
+//     Tree **nodes = (Tree **) calloc(numElements, sizeof(Tree *));
+//     fillLevel(nodes, root, level, 0, 0);
+//
+//     if (level > 0) {
+//         printSlahes(numElements, widthForEachElement, nodes);
+//     }
+//
+//     for (int i = 0; i < numElements; i++) {
+//         if (nodes[i] != NULL) {
+//             printNode(widthForEachElement, nodes[i]->value);
+//         } else {
+//             printf("%*s", widthForEachElement, "");
+//         }
+//     }
+//     free(nodes);
+//     printf("\n");
+// }
+//
+// void fillLevel(Tree *nodes[], Tree *node, int targetLevel, int level, int nr) {
+//     if (level == targetLevel) {
+//         nodes[nr] = node;
+//         return;
+//     }
+//
+//     if (node->smaller != NULL) {
+//         fillLevel(nodes, node->smaller, targetLevel, level + 1, nr * 2);
+//     }
+//     if (node->bigger != NULL) {
+//         fillLevel(nodes, node->bigger, targetLevel, level + 1, nr * 2 + 1);
+//     }
+// }
+//
+// void printNode(int widthForEachElement, int data) {
+//     char buf[20];
+//     sprintf(buf, "%02d", data);
+//     printCentered(widthForEachElement, buf);
+// }
+//
+// //omit slahes if there is no data in that subtree
+// void printSlahes(int numElements, int widthForEachElement, Tree *const *nodes) {
+//     for (int i = 0; i < numElements; i += 2) {
+//         if (nodes[i] != NULL) {
+//             printf("%*s", widthForEachElement / 2, "");
+//             printCentered(widthForEachElement / 2, "/");
+//         } else {
+//             printf("%*s", widthForEachElement, "");
+//         }
+//         if (nodes[i + 1] != NULL) {
+//             printCentered(widthForEachElement / 2, "\\");
+//             printf("%*s", widthForEachElement / 2, "");
+//         } else {
+//             printf("%*s", widthForEachElement, "");
+//         }
 //     }
 //     printf("\n");
-//   }
 // }
 //
-// void putTreeInMatrix(Tree* element, int**treeMatrix){
-//   int line, column, nextLine, nextColumn, amount_of_NC, c;
-//   line = element->height - 1;
-//   column = treeMatrix[line][0] + 1;
-//
-//   treeMatrix[line][column] = element->value;
-//   treeMatrix[line][0]++;
-//
-//   if (element->smaller != NULL) {
-//     putTreeInMatrix(element->smaller, treeMatrix);
-//   }else{
-//     nextLine = line + 1;
-//     amount_of_NC = 1;
-//     for (int l = nextLine; l < getHeight(element); l++) {
-//       //IMPLEMENTAR A ARVORE DE NOCHILDS
-//       printf("\n\n%ds NCs\n", amount_of_NC);
-//       for (int nc = 0; nc < amount_of_NC; nc++) {
-//         c = treeMatrix[l][0] + 1;
-//         printf("%dº nc\n", nc + 1);
-//         printf("l = %d\n", l);
-//         printf("c = %d\n\n", c);
-//         treeMatrix[l][c] = NO_CHILD;
-//         treeMatrix[l][0]++;
-//         printf("elemento: %d\n\n",treeMatrix[l][c] );
-//       }
-//       amount_of_NC = amount_of_NC * 2;
-//     }
-//   }
-//   if (element->bigger != NULL) {
-//     putTreeInMatrix(element->bigger, treeMatrix);
-//   }else{
-//     nextLine = line + 1;
-//     amount_of_NC = 1;
-//     for (int l = nextLine; l < getHeight(element); l++) {
-//       printf("\n\n%ds NCs\n", amount_of_NC);
-//       //IMPLEMENTAR A ARVORE DE NOCHILDS
-//       for (int nc = 0; nc < amount_of_NC; nc++) {
-//         c = treeMatrix[l][0];
-//         printf("%dº nc\n", nc + 1);
-//         printf("l = %d\n", l);
-//         printf("c = %d\n\n", c + 1);
-//         treeMatrix[l][c + 1] = NO_CHILD;
-//         treeMatrix[l][0]++;
-//         printf("elemento: %d\n\n",treeMatrix[l][c] );
-//       }
-//       amount_of_NC = amount_of_NC * 2;
-//     }
-//   }
+// void printCentered(int width, char *str) {
+//     int emptySpace = (int) (width - strlen(str)) / 2;
+//     printf("%*s%s%*s", emptySpace, "", str, width - (int) strlen(str) - emptySpace, "");
 // }
+//
+// //////////////////////////////////////////////////////////////////////////////////////////
 
 void isFull(Tree* root){
   int number_of_elements, height;
