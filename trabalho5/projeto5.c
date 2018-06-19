@@ -3,15 +3,15 @@
 
 int main(){
   Tree * arvore;
-  arvore = loadTreeFromFile("BSTs/bst2.txt");
+  arvore = loadTreeFromFile("BSTs/bst6.txt");
 
   int tamanho = getHeight(arvore);
   printf("altura = %d\n", tamanho);
   // isFull(arvore);
   // searchValue(arvore,26);
-  // showTree(arvore);
-  printInOrder(arvore);
-  printf("\n");
+  showTree(arvore);
+  // printInOrder(arvore);
+  // printf("\n");
   balanceTree(arvore);
   // printPreOrder(arvore);
   // printf("\n");

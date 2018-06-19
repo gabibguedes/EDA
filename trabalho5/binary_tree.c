@@ -37,7 +37,6 @@ Tree *loadTreeFromFile(char filename[100]){
   root->smaller = NULL;
   root->bigger = NULL;
   root->height = 1;
-  printf("inicio = %d\n", root->value);
 
   while(!feof(fp)){
     new_branch = (Tree*)(malloc(sizeof(Tree)));
@@ -46,8 +45,6 @@ Tree *loadTreeFromFile(char filename[100]){
     new_branch->bigger = NULL;
 
     old_node = root;
-    printf("**************************************\n");
-    printf("numero: %d\n", new_branch->value);
 
     int place_not_found = 1;
 
@@ -57,10 +54,6 @@ Tree *loadTreeFromFile(char filename[100]){
           old_node->bigger = new_branch;
           place_not_found = 0;
           new_branch->height = old_node->height + 1;
-          printf("Valor anterior = %d\n",old_node->value);
-          printf("é maior\n");
-          printf("%d\n",new_branch->height );
-          printf("**************************************\n");
         }else{
           old_node = old_node->bigger;
         }
@@ -69,10 +62,6 @@ Tree *loadTreeFromFile(char filename[100]){
           old_node->smaller = new_branch;
           place_not_found = 0;
           new_branch->height = old_node->height + 1;
-          printf("Valor anterior = %d\n",old_node->value);
-          printf("é menor\n");
-          printf("%d\n",new_branch->height );
-          printf("**************************************\n");
         }else{
           old_node = old_node->smaller;
         }
@@ -555,7 +544,6 @@ Tree * setBackbone(Tree *root){
       daddy = rotationRight(grandpa, daddy, daddy->smaller);
     }
   }
-  showTree(root );
   return root;
 }
 
